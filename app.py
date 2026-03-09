@@ -2,7 +2,7 @@ import os
 
 from cs50 import SQL
 from dotenv import load_dotenv
-from flask import Flask, redirect, render_template, request, session
+from flask import Flask, flash, redirect, render_template, request, session
 from werkzeug.security import check_password_hash, generate_password_hash
 
 import helpers
@@ -36,25 +36,23 @@ def login():
         password = request.form.get("password")
         email = request.form.get("email")
         if not password or not email:
-            return render_template(
-                "error.html", error="E-Mail und Passwort sind erforderlich."
-            )
+            flash("E-Mail und Passwort sind erforderlich.", "danger")
+            return redirect("/login")
 
         users = db.execute(
             "SELECT * FROM users WHERE email = ?", request.form.get("email")
         )
 
         if not users:
-            return render_template(
-                "error.html", error="Ungültige E-Mail oder ungültiges Passwort."
-            )
+            flash("Ungültige E-Mail oder ungültiges Passwort.", "danger")
+            return redirect("/login")
 
         if check_password_hash(users[0]["hash"], password):
             session["user_id"] = users[0]["id"]
+            flash("Erfolgreich angemeldet!", "success")
         else:
-            return render_template(
-                "error.html", error="Ungültige E-Mail oder ungültiges Passwort."
-            )
+            flash("Ungültige E-Mail oder ungültiges Passwort.", "danger")
+            return redirect("/login")
 
         return redirect("/")
     else:
@@ -69,20 +67,16 @@ def register():
         confirm_password = request.form.get("confirm_password")
 
         if not email or not password or not confirm_password:
-            return render_template(
-                "error.html",
-                error="E-Mail, Passwort und Bestätigung sind erforderlich.",
-            )
+            flash("E-Mail, Passwort und Bestätigung sind erforderlich.", "danger")
+            return redirect("/register")
 
         if password != confirm_password:
-            return render_template(
-                "error.html", error="Die Passwörter stimmen nicht überein."
-            )
+            flash("Die Passwörter stimmen nicht überein.", "danger")
+            return redirect("/register")
 
         if db.execute("SELECT * FROM users WHERE email = ?", email):
-            return render_template(
-                "error.html", error="Diese E-Mail ist bereits registriert."
-            )
+            flash("Diese E-Mail ist bereits registriert.", "danger")
+            return redirect("/register")
 
         hash = generate_password_hash(password)
 
@@ -91,6 +85,7 @@ def register():
         user_id = db.execute("SELECT id FROM users WHERE email = ?", email)[0]["id"]
 
         session["user_id"] = user_id
+        flash("Registrierung erfolgreich! Willkommen!", "success")
         return redirect("/")
 
     else:
@@ -103,6 +98,7 @@ def logout():
     """Log user out by clearing session"""
     if request.method == "POST":
         session.clear()
+        flash("Erfolgreich abgemeldet!", "success")
         return redirect("/login")
     else:
         return render_template("logout.html")
