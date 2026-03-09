@@ -3,7 +3,7 @@ import os
 from cs50 import SQL
 from dotenv import load_dotenv
 from flask import Flask, redirect, render_template, request, session
-from werkzeug.security import generate_password_hash
+from werkzeug.security import check_password_hash, generate_password_hash
 
 import helpers
 
@@ -17,46 +17,95 @@ app = Flask(__name__)
 # This is required for session management (signing cookies securely)
 app.config["SECRET_KEY"] = os.environ.get("SECRET_KEY")
 if not app.config["SECRET_KEY"]:
-    raise ValueError("No SECRET_KEY set in environment. Check your .env file.")
+    raise ValueError("Kein SECRET_KEY in der Umgebung gesetzt. Prüfe deine .env-Datei.")
 
 db = SQL("sqlite:///calories.db")
 
 
 @app.route("/")
+@helpers.login_required
 def index():
-    helpers.login_required()
-    return render_template("index.html")
+    return render_template("index.html", user_id=session.get("user_id"))
 
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
     if request.method == "POST":
         session.clear()
-        email = request.form.get("email")
-        password = request.form.get("password")
 
-        if not email or not password:
+        password = request.form.get("password")
+        email = request.form.get("email")
+        if not password or not email:
             return render_template(
-                "error.html", error="Must provide email and password"
+                "error.html", error="E-Mail und Passwort sind erforderlich."
             )
 
-        hash = generate_password_hash(password)
-
-        print(db.execute("SELECT * FROM users WHERE email = ?", email))
-        print(
-            db.execute("SELECT * FROM users WHERE email = ? AND hash = ?", email, hash)
+        users = db.execute(
+            "SELECT * FROM users WHERE email = ?", request.form.get("email")
         )
 
-        # users = db.execute("SELECT * FROM users WHERE email = ?", email)
+        if not users:
+            return render_template(
+                "error.html", error="Ungültige E-Mail oder ungültiges Passwort."
+            )
 
-        # for user in users:
-        #     if email == user['email']:
-        #         return render_template("error.html", error="Email already exists")
-        # check email with db query
+        if check_password_hash(users[0]["hash"], password):
+            session["user_id"] = users[0]["id"]
+        else:
+            return render_template(
+                "error.html", error="Ungültige E-Mail oder ungültiges Passwort."
+            )
 
         return redirect("/")
     else:
         return render_template("login.html")
+
+
+@app.route("/register", methods=["GET", "POST"])
+def register():
+    if request.method == "POST":
+        email = request.form.get("email")
+        password = request.form.get("password")
+        confirm_password = request.form.get("confirm_password")
+
+        if not email or not password or not confirm_password:
+            return render_template(
+                "error.html",
+                error="E-Mail, Passwort und Bestätigung sind erforderlich.",
+            )
+
+        if password != confirm_password:
+            return render_template(
+                "error.html", error="Die Passwörter stimmen nicht überein."
+            )
+
+        if db.execute("SELECT * FROM users WHERE email = ?", email):
+            return render_template(
+                "error.html", error="Diese E-Mail ist bereits registriert."
+            )
+
+        hash = generate_password_hash(password)
+
+        db.execute("INSERT INTO users (email, hash) VALUES(?,?)", email, hash)
+
+        user_id = db.execute("SELECT id FROM users WHERE email = ?", email)[0]["id"]
+
+        session["user_id"] = user_id
+        return redirect("/")
+
+    else:
+        return render_template("register.html")
+
+
+@app.route("/logout", methods=["GET", "POST"])
+@helpers.login_required
+def logout():
+    """Log user out by clearing session"""
+    if request.method == "POST":
+        session.clear()
+        return redirect("/login")
+    else:
+        return render_template("logout.html")
 
 
 if __name__ == "__main__":
