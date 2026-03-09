@@ -8,3 +8,8 @@ This project follows the CS50 honesty guidance for AI-assisted work.
 See the repository policy prompt: [.github/prompts/honesty.prompt.md](.github/prompts/honesty.prompt.md).
 
 When AI tools (including GitHub Copilot) help with code, layout, debugging, or design, that assistance is cited in code comments or documentation, and all submitted work remains understood and owned by the student.
+
+## Name: "Kalorien Zähler"
+
+This Web application is made for counting calories with the end goal of weight gain instead of loss.
+This idea stems from my own severe underweight and i made this app to better my health
