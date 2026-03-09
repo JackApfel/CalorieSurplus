@@ -1,5 +1,4 @@
 ---
-name: honesty
 description: Use these instructions whenever you assist with the CS50 final project “Kalorien Zähler” so the code and explanations respect the academic honesty policy and citation requirements.
 ---
 

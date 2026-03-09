@@ -1,0 +1,34 @@
+/* Assisted by GitHub Copilot while refactoring the base mobile-first layout. */
+
+html,
+body {
+  height: 100%;
+}
+
+.app-shell {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.app-navbar {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.app-navbar .nav-link {
+  color: rgba(255, 255, 255, 0.88);
+}
+
+.app-navbar .nav-link:hover,
+.app-navbar .nav-link:focus {
+  color: #ffffff;
+}
+
+main.container {
+  width: 100%;
+}
+
+.app-footer {
+  border-top: 1px solid #dee2e6;
+  background-color: #ffffff;
+}
