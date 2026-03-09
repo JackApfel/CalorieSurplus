@@ -1,10 +1,23 @@
+import os
+
 from cs50 import SQL
+from dotenv import load_dotenv
 from flask import Flask, redirect, render_template, request, session
 from werkzeug.security import generate_password_hash
 
 import helpers
 
+# Load environment variables from .env file (for local development)
+# Assisted by GitHub Copilot while setting up secure configuration management
+load_dotenv()
+
 app = Flask(__name__)
+
+# Configure Flask secret key from environment variable
+# This is required for session management (signing cookies securely)
+app.config["SECRET_KEY"] = os.environ.get("SECRET_KEY")
+if not app.config["SECRET_KEY"]:
+    raise ValueError("No SECRET_KEY set in environment. Check your .env file.")
 
 db = SQL("sqlite:///calories.db")
 
