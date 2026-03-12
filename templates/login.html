@@ -1,12 +1,12 @@
-{% extends "layout.html" %} {% block title %}Anmelden{% endblock %} {% block content %}
+{% extends "layout.html" %} {% block title %}Sign In{% endblock %} {% block content %}
 <form action="/login" method="POST" class="container py-4">
   <div class="row g-3">
     <div class="col-12">
       <input
         type="email"
         class="form-control"
-        placeholder="E-Mail"
-        aria-label="E-Mail"
+        placeholder="Email"
+        aria-label="Email"
         name="email"
         required
       />
@@ -15,16 +15,16 @@
       <input
         type="password"
         class="form-control"
-        placeholder="Passwort"
-        aria-label="Passwort"
+        placeholder="Password"
+        aria-label="Password"
         name="password"
         required
       />
     </div>
     <div class="col-12 d-grid">
-      <button type="submit" class="btn btn-primary">Anmelden</button>
+      <button type="submit" class="btn btn-primary">Sign In</button>
     </div>
   </div>
-  <a href="/register">Noch kein Konto? Hier registrieren</a>
+  <a href="/register">No account yet? Register here</a>
 </form>
 {% endblock %}

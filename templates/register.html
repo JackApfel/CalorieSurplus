@@ -1,4 +1,4 @@
-{% extends "layout.html" %} {% block title %}Registrieren{% endblock %} {% block content %}
+{% extends "layout.html" %} {% block title %}Register{% endblock %} {% block content %}
 <!-- Assisted by GitHub Copilot while fixing Bootstrap mobile-first form structure. -->
 <form action="/register" method="POST" class="container py-4">
   <div class="row g-3">
@@ -28,8 +28,8 @@
       <input
         type="email"
         class="form-control"
-        placeholder="E-Mail"
-        aria-label="E-Mail"
+        placeholder="Email"
+        aria-label="Email"
         name="email"
         required
       />
@@ -38,8 +38,8 @@
       <input
         type="password"
         class="form-control"
-        placeholder="Passwort"
-        aria-label="Passwort"
+        placeholder="Password"
+        aria-label="Password"
         name="password"
         required
       />
@@ -48,16 +48,16 @@
       <input
         type="password"
         class="form-control"
-        placeholder="Passwort bestätigen"
-        aria-label="Passwort bestätigen"
+        placeholder="Confirm password"
+        aria-label="Confirm password"
         name="confirm_password"
         required
       />
     </div>
     <div class="col-12 d-grid">
-      <button type="submit" class="btn btn-primary">Registrieren</button>
+      <button type="submit" class="btn btn-primary">Register</button>
     </div>
   </div>
-  <a href="/login">Schon ein Konto? Hier anmelden!</a>
+  <a href="/login">Already have an account? Sign in here</a>
 </form>
 {% endblock %}

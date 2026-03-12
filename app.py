@@ -17,7 +17,7 @@ app = Flask(__name__)
 # This is required for session management (signing cookies securely)
 app.config["SECRET_KEY"] = os.environ.get("SECRET_KEY")
 if not app.config["SECRET_KEY"]:
-    raise ValueError("Kein SECRET_KEY in der Umgebung gesetzt. Prüfe deine .env-Datei.")
+    raise ValueError("No SECRET_KEY set in the environment. Check your .env file.")
 
 db = SQL("sqlite:///calories.db")
 
@@ -36,7 +36,7 @@ def login():
         password = request.form.get("password")
         email = request.form.get("email")
         if not password or not email:
-            flash("E-Mail und Passwort sind erforderlich.", "danger")
+            flash("Email and password are required.", "danger")
             return redirect("/login")
 
         users = db.execute(
@@ -44,14 +44,14 @@ def login():
         )
 
         if not users:
-            flash("Ungültige E-Mail oder ungültiges Passwort.", "danger")
+            flash("Invalid email or password.", "danger")
             return redirect("/login")
 
         if check_password_hash(users[0]["hash"], password):
             session["user_id"] = users[0]["id"]
-            flash("Erfolgreich angemeldet!", "success")
+            flash("Signed in successfully!", "success")
         else:
-            flash("Ungültige E-Mail oder ungültiges Passwort.", "danger")
+            flash("Invalid email or password.", "danger")
             return redirect("/login")
 
         return redirect("/")
@@ -67,15 +67,15 @@ def register():
         confirm_password = request.form.get("confirm_password")
 
         if not email or not password or not confirm_password:
-            flash("E-Mail, Passwort und Bestätigung sind erforderlich.", "danger")
+            flash("Email, password, and confirmation are required.", "danger")
             return redirect("/register")
 
         if password != confirm_password:
-            flash("Die Passwörter stimmen nicht überein.", "danger")
+            flash("Passwords do not match.", "danger")
             return redirect("/register")
 
         if db.execute("SELECT * FROM users WHERE email = ?", email):
-            flash("Diese E-Mail ist bereits registriert.", "danger")
+            flash("This email is already registered.", "danger")
             return redirect("/register")
 
         hash = generate_password_hash(password)
@@ -85,7 +85,7 @@ def register():
         user_id = db.execute("SELECT id FROM users WHERE email = ?", email)[0]["id"]
 
         session["user_id"] = user_id
-        flash("Registrierung erfolgreich! Willkommen!", "success")
+        flash("Registration successful. Welcome!", "success")
         return redirect("/")
 
     else:
@@ -98,7 +98,7 @@ def logout():
     """Log user out by clearing session"""
     if request.method == "POST":
         session.clear()
-        flash("Erfolgreich abgemeldet!", "success")
+        flash("Logged out successfully!", "success")
         return redirect("/login")
     else:
         return render_template("logout.html")
