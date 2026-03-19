@@ -1,0 +1,14 @@
+{% extends "layout.html" %} {% block title %}Catalog{% endblock %} {% block content %}
+<div class="container mt-5 text-center">
+  <h1>Catalog</h1>
+  <p>TODO</p>
+  <h1>TEST ITEM</h1>
+  <p>
+    {{ item.product.product_name_en | default(item.product.product_name_de) |
+    default(item.product.product_name) | default('N/A') }}
+  </p>
+  <p>{{ item.product.brands | default('N/A') }}</p>
+  <p>{{ item.product.nutriments['energy-kcal_100g'] | default('N/A') }}</p>
+  <!-- Syntax Help from Copilot -->
+</div>
+{% endblock %}

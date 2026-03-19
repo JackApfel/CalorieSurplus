@@ -4,6 +4,7 @@ from cs50 import SQL
 from dotenv import load_dotenv
 from flask import Flask, flash, redirect, render_template, request, session
 from werkzeug.security import check_password_hash, generate_password_hash
+import requests
 
 import helpers
 
@@ -102,6 +103,24 @@ def logout():
         return redirect("/login")
     else:
         return render_template("logout.html")
+
+
+
+@app.route("/catalog")
+@helpers.login_required
+def catalog():
+    barcode = "3274080005003"
+    url = f"https://world.openfoodfacts.org/api/v2/product/{barcode}.json"
+    headers = {
+        "User-Agent": "KalorienZaehler/0.1 jack.apfel_dev@pm.me"
+    }
+
+    api_response = requests.get(url, headers=headers, timeout=10)
+    api_response.raise_for_status()
+    data = api_response.json()
+
+    print(f"\n\n{data}\n\n")
+    return render_template("catalog.html", item=data)
 
 
 if __name__ == "__main__":
