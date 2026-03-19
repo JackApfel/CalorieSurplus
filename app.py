@@ -109,15 +109,30 @@ def logout():
 @app.route("/catalog")
 @helpers.login_required
 def catalog():
-    barcode = "3274080005003"
-    url = f"https://world.openfoodfacts.org/api/v2/product/{barcode}.json"
-    headers = {
-        "User-Agent": "KalorienZaehler/0.1 jack.apfel_dev@pm.me"
+    # TODO: Implement query based parameters for dynamic product based lookup
+    # for example by coming to this route with a query like ?item=Milk
+    # Get the response from OFF API and render the catalog page with the product information
+
+    #for now example parameter are hardcoded
+    params = {
+        "search_terms": "milk",
+        "json": "True",
+        "page_size": 5,
     }
 
-    api_response = requests.get(url, headers=headers, timeout=10)
-    api_response.raise_for_status()
-    data = api_response.json()
+    headers = {
+        "User-Agent": "Kalorien Zähler/0.1 jack.apfel_dev@pm.me"
+    }
+
+    url = "https://world.openfoodfacts.org/cgi/search.pl"
+
+    response = requests.get(url, params=params, headers=headers, timeout=10)
+    data = response.json()
+
+    for product in data.get("products", []):
+        name = product.get("product_name", "Unknown")
+        kcal = product.get("nutriments", {}).get("energy-kcal_100g", "N/A")
+        print(f"{name}: {kcal} kcal/100g")
 
     print(f"\n\n{data}\n\n")
     return render_template("catalog.html", item=data)
