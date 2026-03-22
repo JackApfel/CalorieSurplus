@@ -863,6 +863,68 @@ Das Bootstrap-Grid hat **12 Spalten**.
 </div>
 ```
 
+### 8.8a Card mit Bild
+
+Mit `card-img-top` platzierst du ein Bild oben in der Card:
+
+```html
+<div class="card">
+  <img src="https://example.com/foto.jpg" class="card-img-top" alt="Produktfoto">
+  <div class="card-body">
+    <h5 class="card-title">Banana</h5>
+    <p class="card-text">105 kcal pro Portion</p>
+    <a href="#" class="btn btn-primary">Hinzufuegen</a>
+  </div>
+</div>
+```
+
+- `card-img-top` — positioniert das Bild ueber dem Card-Body.
+- Immer ein `alt`-Attribut fuer Barrierefreiheit setzen.
+- Um Bilder gleich hoch zu halten, nutze CSS: `object-fit: contain; height: 200px;`.
+
+### 8.8b Gleich hohe Cards
+
+Wenn Cards im Grid unterschiedlich viel Text haben, werden sie verschieden hoch. Loesung:
+
+1. **`h-100`** auf der `.card` — streckt die Card auf die volle Spaltenhoehe.
+2. **`d-flex flex-column`** auf `.card-body` — macht den Body zur Flex-Spalte.
+3. **`mt-auto`** auf dem Button — schiebt den Button nach unten.
+
+```html
+<div class="col">
+  <div class="card h-100">
+    <img src="..." class="card-img-top" alt="...">
+    <div class="card-body d-flex flex-column">
+      <h5 class="card-title">Produktname</h5>
+      <p class="card-text">Einige Details hier...</p>
+      <a href="#" class="btn btn-primary mt-auto">Hinzufuegen</a>
+    </div>
+  </div>
+</div>
+```
+
+> **Warum das funktioniert:** Bootstrap-Grid-Spalten sind standardmaessig gleich hoch (dank Flexbox). `h-100` laesst die Card diese Hoehe ausfuellen. `d-flex flex-column` + `mt-auto` drueckt den Button nach unten, sodass alle Buttons auf gleicher Linie stehen.
+
+### 8.8c Responsives Card-Grid mit `row-cols-*`
+
+Statt fixem `row-cols-4` nutze responsive Breakpoints, damit Cards auf dem Handy untereinander und auf dem Desktop nebeneinander stehen:
+
+```html
+<div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-3">
+  <!-- Cards hier -->
+</div>
+```
+
+| Klasse | Breakpoint | Spalten | Bildschirm |
+|--------|-----------|---------|------------|
+| `row-cols-1` | Standard | 1 | Handys (< 576px) |
+| `row-cols-sm-2` | >= 576px | 2 | Grosse Handys / kleine Tablets |
+| `row-cols-md-3` | >= 768px | 3 | Tablets |
+| `row-cols-lg-4` | >= 992px | 4 | Desktops |
+
+- **`g-3`** fuegt gleichmaessige Abstaende (Gutters) zwischen Cards hinzu, horizontal und vertikal.
+- `g-*` Werte gehen von `0` (kein Abstand) bis `5` (groesster Abstand).
+
 ### 8.9 Spacing-Utilities
 
 Muster: `{property}{side}-{size}`
@@ -1084,6 +1146,7 @@ Die Antwort ist JSON. Wichtige Felder liegen unter `data["product"]`:
 | `product.nutriments.fiber_100g` | Ballaststoffe pro 100g | `0` |
 | `product.serving_size` | Portionsgroesse | `"15 g"` |
 | `product.image_url` | Produktbild-URL | `"https://..."` |
+| `product.image_front_small_url` | Kleines Vorschaubild-URL | `"https://..."` |
 | `product.nutriscore_grade` | Nutri-Score (a-e) | `"e"` |
 | `product.categories_tags` | Kategorien-Liste | `["en:spreads", ...]` |
 | `status` | `1` = gefunden, `0` = nicht gefunden | `1` |

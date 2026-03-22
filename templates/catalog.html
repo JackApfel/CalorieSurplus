@@ -1,14 +1,28 @@
 {% extends "layout.html" %} {% block title %}Catalog{% endblock %} {% block content %}
 <div class="container mt-5 text-center">
   <h1>Catalog</h1>
-  <p>TODO</p>
-  <h1>TEST ITEM</h1>
-  <p>
-    {{ item.product.product_name_en | default(item.product.product_name_de) |
-    default(item.product.product_name) | default('N/A') }}
-  </p>
-  <p>{{ item.product.brands | default('N/A') }}</p>
-  <p>{{ item.product.nutriments['energy-kcal_100g'] | default('N/A') }}</p>
-  <!-- Syntax Help from Copilot -->
+  <h2>{{search_term}}</h2>
+</div>
+<!--Build with the CHEATSHEET as reference-->
+<div class="container">
+  <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-3">
+    {% for data in item.products %}
+    <div class="col mb-3 d-flex flex-column justify-content-end">
+      <div class="card rounded">
+        <img src="{{data.image_front_small_url}}" alt="{{data.product_name}}" style="max-width: 50%;
+  height: auto;" class="img-thumbnail rounded">
+        <div class="card-body d-flex flex-column justify-content-end">
+          <p class="h5 card-title">{{data.product_name | default("Unknown")}}</p>
+          <ul>
+            <li><p class="card-text">Brand: {{data.brands | default("Unknown")}}</p></li>
+            <li><p class="card-text">Calories per 100g: <strong>{{ (data.nutriments or {})['energy-kcal_100g'] | default('N/A') }}</strong></p></li>
+          </ul>
+          
+          <a href="#" class="btn btn-primary">Add</a>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
 </div>
 {% endblock %}

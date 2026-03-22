@@ -113,29 +113,37 @@ def catalog():
     # for example by coming to this route with a query like ?item=Milk
     # Get the response from OFF API and render the catalog page with the product information
 
+    # Assisted by GitHub Copilot while optimizing API requests and adding error handling.
+
     #for now example parameter are hardcoded
+    search_term = "Paulaner Spezi"
     params = {
-        "search_terms": "milk",
-        "json": "True",
-        "page_size": 5,
+        "search_terms": str(search_term),
+        "json": "true",
+        "page_size": 8,
+        # Only request the fields we actually need — massively reduces response size and latency
+        "fields": "product_name,brands,nutriments,image_front_small_url",
     }
 
     headers = {
-        "User-Agent": "Kalorien Zähler/0.1 jack.apfel_dev@pm.me"
+        # Format: AppName/Version (contact-email) — no special chars in name, email in parentheses
+        "User-Agent": "KalorienZaehler/0.1 (jack.apfel_dev@pm.me)"
     }
 
     url = "https://world.openfoodfacts.org/cgi/search.pl"
 
-    response = requests.get(url, params=params, headers=headers, timeout=10)
-    data = response.json()
+    try:
+        response = requests.get(url, params=params, headers=headers, timeout=32)
+        response.raise_for_status()
+        data = response.json()
+    except requests.exceptions.Timeout:
+        flash("The food database took too long to respond. Please try again.", "danger")
+        return redirect("/")
+    except requests.exceptions.RequestException:
+        flash("Could not reach the food database. Please try again later.", "danger")
+        return redirect("/")
 
-    for product in data.get("products", []):
-        name = product.get("product_name", "Unknown")
-        kcal = product.get("nutriments", {}).get("energy-kcal_100g", "N/A")
-        print(f"{name}: {kcal} kcal/100g")
-
-    print(f"\n\n{data}\n\n")
-    return render_template("catalog.html", item=data)
+    return render_template("catalog.html", item=data, search_term=search_term)
 
 
 if __name__ == "__main__":
