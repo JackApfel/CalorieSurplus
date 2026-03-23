@@ -17,18 +17,17 @@ def create():
 
     db = SQL("sqlite:///calories.db")
 
-    db.execute("CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY AUTOINCREMENT, email TEXT NOT NULL, hash TEXT NOT NULL)")
-    db.execute("CREATE TABLE IF NOT EXISTS foods (name TEXT NOT NULL, calories INTEGER NOT NULL, user_id INTEGER NOT NULL, FOREIGN KEY(user_id) REFERENCES users(id))")
+    db.execute("CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY AUTOINCREMENT, email TEXT NOT NULL, hash TEXT NOT NULL, created_at TEXT DEFAULT CURRENT_TIMESTAMP)")
+    db.execute("CREATE TABLE IF NOT EXISTS foods (name TEXT NOT NULL, calories TEXT NOT NULL, user_id INTEGER NOT NULL, barcode INTEGER NOT NULL, created_at TEXT DEFAULT CURRENT_TIMESTAMP, FOREIGN KEY(user_id) REFERENCES users(id))")
 
 def drop():
     Path("calories.db").touch(exist_ok=True)
     db = SQL("sqlite:///calories.db")
 
-    db.execute("DROP TABLE IF EXISTS users")
     db.execute("DROP TABLE IF EXISTS foods")
+    db.execute("DROP TABLE IF EXISTS users")
 
-    db.execute("CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY AUTOINCREMENT, email TEXT NOT NULL, hash TEXT NOT NULL)")
-    db.execute("CREATE TABLE IF NOT EXISTS foods (name TEXT NOT NULL, calories INTEGER NOT NULL, user_id INTEGER NOT NULL, FOREIGN KEY(user_id) REFERENCES users(id))")
+    create()
 
 
 # match syntax was found on StackOverflow when searching for a switch like statement in Python 

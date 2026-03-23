@@ -194,6 +194,87 @@ secret = os.environ.get("SECRET_KEY")      # use the value
 SECRET_KEY=some-random-string
 ```
 
+### 1.11 Query Parameters (URL Query Strings)
+
+A **query string** is the part of a URL after the `?`. It passes key-value pairs to the server without needing a form or POST request.
+
+> **Analogy:** Query parameters are like sticky notes on a letter — they add extra information ("which product?", "which page?") without changing the address itself.
+
+**URL anatomy:**
+
+```
+/search?product=Milch&page=2
+         \___________/ \____/
+          param 1       param 2
+```
+
+**Reading query parameters in Flask:**
+
+```python
+from flask import request
+
+@app.route("/search")
+def search():
+    product = request.args.get("product")          # "Milch"
+    page    = request.args.get("page", 1, type=int) # 2 (as int, default 1)
+    return render_template("search.html", product=product, page=page)
+```
+
+- `request.args` is a dict-like object with all `?key=value` pairs.
+- `.get(key, default, type=)` — returns the default if the key is missing and can auto-convert the type.
+
+**Multiple parameters:**
+
+```python
+# URL: /catalog?category=fruit&sort=calories&order=asc
+category = request.args.get("category")   # "fruit"
+sort_by  = request.args.get("sort")       # "calories"
+order    = request.args.get("order")      # "asc"
+```
+
+**Building URLs with query strings using `url_for`:**
+
+```python
+from flask import url_for
+
+# Generates: /search?product=Milch&page=2
+url_for("search", product="Milch", page=2)
+```
+
+Any keyword argument that is **not** a route variable becomes a query parameter automatically.
+
+**Creating links with query strings in templates (Jinja):**
+
+```html
+<!-- Static link -->
+<a href="/search?product=Milch">Search for Milch</a>
+
+<!-- Dynamic link with url_for (preferred) -->
+<a href="{{ url_for('search', product='Milch') }}">Search for Milch</a>
+
+<!-- Using a variable -->
+<a href="{{ url_for('search', product=item_name) }}">{{ item_name }}</a>
+```
+
+**Redirecting with query parameters:**
+
+```python
+return redirect(url_for("search", product="Milch"))
+# Browser goes to /search?product=Milch
+```
+
+**Common patterns:**
+
+| Use Case | Example URL | Flask Code |
+|----------|-------------|------------|
+| Search | `/search?q=apple` | `request.args.get("q")` |
+| Pagination | `/catalog?page=3` | `request.args.get("page", 1, type=int)` |
+| Filtering | `/catalog?category=fruit` | `request.args.get("category")` |
+| Sorting | `/catalog?sort=name&order=asc` | `request.args.get("sort")` |
+| Product detail | `/detail?product=Milch` | `request.args.get("product")` |
+
+> **Tip:** Query parameters are visible in the URL bar — never pass passwords or sensitive data this way. Use POST + form fields for that.
+
 ---
 
 ## 2. Jinja2 Templating
@@ -863,6 +944,68 @@ Bootstrap's grid has **12 columns**. Think of it as slicing a pizza into 12 piec
 </div>
 ```
 
+### 8.8a Card with Image
+
+Use `card-img-top` to place an image at the top of a card:
+
+```html
+<div class="card">
+  <img src="https://example.com/photo.jpg" class="card-img-top" alt="Product photo">
+  <div class="card-body">
+    <h5 class="card-title">Banana</h5>
+    <p class="card-text">105 kcal per serving</p>
+    <a href="#" class="btn btn-primary">Add</a>
+  </div>
+</div>
+```
+
+- `card-img-top` — positions the image above the card body.
+- Always include an `alt` attribute for accessibility.
+- To keep images the same height, use CSS: `object-fit: contain; height: 200px;`.
+
+### 8.8b Equal-Height Cards
+
+When cards are in a grid, different content lengths make them unequal. Fix this with:
+
+1. **`h-100`** on the `.card` — stretches the card to the full column height.
+2. **`d-flex flex-column`** on `.card-body` — makes the body a flex column.
+3. **`mt-auto`** on the button — pushes the button to the bottom.
+
+```html
+<div class="col">
+  <div class="card h-100">
+    <img src="..." class="card-img-top" alt="...">
+    <div class="card-body d-flex flex-column">
+      <h5 class="card-title">Product Name</h5>
+      <p class="card-text">Some details here...</p>
+      <a href="#" class="btn btn-primary mt-auto">Add</a>
+    </div>
+  </div>
+</div>
+```
+
+> **Why it works:** Bootstrap grid columns are equal height by default (Flexbox). `h-100` makes the card fill that height. `d-flex flex-column` + `mt-auto` pushes the button down so all buttons line up.
+
+### 8.8c Responsive Card Grid with `row-cols-*`
+
+Instead of fixed `row-cols-4`, use responsive breakpoints so cards stack on mobile and spread on desktop:
+
+```html
+<div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-3">
+  <!-- cards here -->
+</div>
+```
+
+| Class | Breakpoint | Columns | Screen |
+|-------|-----------|---------|--------|
+| `row-cols-1` | default | 1 | Phones (< 576px) |
+| `row-cols-sm-2` | >= 576px | 2 | Large phones / small tablets |
+| `row-cols-md-3` | >= 768px | 3 | Tablets |
+| `row-cols-lg-4` | >= 992px | 4 | Desktops |
+
+- **`g-3`** adds a uniform gap (gutter) between cards both horizontally and vertically.
+- `g-*` values go from `0` (no gap) to `5` (largest gap).
+
 ### 8.9 Spacing Utilities
 
 Pattern: `{property}{side}-{size}`
@@ -1084,6 +1227,7 @@ The response is a JSON object. Key fields live under `data["product"]`:
 | `product.nutriments.fiber_100g` | Fiber per 100g | `0` |
 | `product.serving_size` | Serving size string | `"15 g"` |
 | `product.image_url` | Product photo URL | `"https://..."` |
+| `product.image_front_small_url` | Small thumbnail URL | `"https://..."` |
 | `product.nutriscore_grade` | Nutri-Score (a–e) | `"e"` |
 | `product.categories_tags` | Categories list | `["en:spreads", ...]` |
 | `status` | `1` = found, `0` = not found | `1` |

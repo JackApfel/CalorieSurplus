@@ -23,10 +23,18 @@ if not app.config["SECRET_KEY"]:
 db = SQL("sqlite:///calories.db")
 
 
-@app.route("/")
+@app.route("/", methods=["GET", "POST"])
 @helpers.login_required
 def index():
-    return render_template("index.html", user_id=session.get("user_id"))
+    if request.method == "POST":
+        name = request.form.get("name")
+        calories = request.form.get("calories")
+        barcode = request.form.get("code")
+
+        db.execute("INSERT INTO foods (name, calories, barcode, user_id) VALUES(?,?,?,?)", name, calories, barcode, session["user_id"])
+        return redirect("/")
+    else:
+        return render_template("index.html", user_id=session.get("user_id"))
 
 
 @app.route("/login", methods=["GET", "POST"])
@@ -106,37 +114,38 @@ def logout():
 
 
 
-@app.route("/catalog")
+@app.route("/catalog", methods=["GET", "POST"])
 @helpers.login_required
 def catalog():
-    # TODO: Implement query based parameters for dynamic product based lookup
-    # for example by coming to this route with a query like ?item=Milk
-    # Get the response from OFF API and render the catalog page with the product information
 
-    #for now example parameter are hardcoded
-    params = {
-        "search_terms": "milk",
-        "json": "True",
-        "page_size": 5,
-    }
+    if request.method == "POST":
+        search_term = str(request.form.get("search"))
+        params = {
+            "search_terms": search_term,
+            "json": "true",
+            "page_size": 8,
+            # Only request the fields we actually need — massively reduces response size and latency
+            "fields": "product_name,brands,nutriments,image_front_small_url,code",
+        }
 
-    headers = {
-        "User-Agent": "Kalorien Zähler/0.1 jack.apfel_dev@pm.me"
-    }
+        headers = {
+            # Format: AppName/Version (contact-email) — no special chars in name, email in parentheses
+            "User-Agent": "KalorienZaehler/0.1 (jack.apfel_dev@pm.me)"
+        }
 
-    url = "https://world.openfoodfacts.org/cgi/search.pl"
+        url = "https://world.openfoodfacts.org/cgi/search.pl"
 
-    response = requests.get(url, params=params, headers=headers, timeout=10)
-    data = response.json()
+        try:
+            response = requests.get(url, params=params, headers=headers, timeout=32)
+            response.raise_for_status()
+            data = response.json()
+        except requests.exceptions.Timeout:
+            flash("The food database took too long to respond. Please try again.", "danger")
+            return redirect("/")
+        except requests.exceptions.RequestException:
+            flash("Could not reach the food database. Please try again later.", "danger")
+            return redirect("/")
 
-    for product in data.get("products", []):
-        name = product.get("product_name", "Unknown")
-        kcal = product.get("nutriments", {}).get("energy-kcal_100g", "N/A")
-        print(f"{name}: {kcal} kcal/100g")
-
-    print(f"\n\n{data}\n\n")
-    return render_template("catalog.html", item=data)
-
-
-if __name__ == "__main__":
-    app.run(debug=True)
+        return render_template("catalog.html", item=data, search_term=search_term)
+    else:
+        return render_template("catalog.html")

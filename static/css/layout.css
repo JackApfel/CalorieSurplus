@@ -32,3 +32,10 @@ main.container {
   border-top: 1px solid #dee2e6;
   background-color: #ffffff;
 }
+
+/* Assisted by GitHub Copilot while making catalog card images uniform. */
+.card-img-top {
+  object-fit: contain;
+  height: 200px;
+  background-color: #f8f9fa;
+}

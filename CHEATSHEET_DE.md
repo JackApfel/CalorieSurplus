@@ -5,7 +5,7 @@
 
 > **Hinweis zur Academic Honesty:** Dieser Spickzettel ist eine *Lernhilfe*, keine Copy-Paste-Quelle.
 > Verstehe jedes Snippet, bevor du es benutzt. Zitiere externen Code, den du einbaust.
-> Siehe `.github/instructions/honesty.instructions.md` fuer die vollstaendige Richtlinie.
+> Siehe `.github/instructions/honesty.instructions.md` für die vollständige Richtlinie.
 
 ---
 
@@ -26,7 +26,7 @@
 
 ## 1. Flask
 
-> **Analogie:** Flask ist der *Kellner* im Restaurant. Ein Kunde (Browser) gibt eine Bestellung auf (HTTP-Request), der Kellner bringt sie in die Kueche (dein Python-Code) und bringt das Gericht zurueck (HTTP-Response).
+> **Analogie:** Flask ist der *Kellner* im Restaurant. Ein Kunde (Browser) gibt eine Bestellung auf (HTTP-Request), der Kellner bringt sie in die Küche (dein Python-Code) und bringt das Gericht zurück (HTTP-Response).
 
 ### 1.1 Minimale App
 
@@ -96,14 +96,14 @@ email = request.form.get("email")
 # URL-Query-Parameter (GET)  — z. B. /search?q=apple
 query = request.args.get("q")
 
-# HTTP-Methode pruefen
+# HTTP-Methode prüfen
 if request.method == "POST":
     ...
 ```
 
 ### 1.6 `redirect`
 
-Leitet den User auf eine andere URL um. Wie ein "go to" fuer den Browser.
+Leitet den User auf eine andere URL um. Wie ein "go to" für den Browser.
 
 ```python
 from flask import redirect
@@ -114,7 +114,7 @@ return redirect("/")           # nach Hause
 
 ### 1.7 `flash`
 
-Zeigt eine einmalige Nachricht auf der *naechsten* Seite an.
+Zeigt eine einmalige Nachricht auf der *nächsten* Seite an.
 
 ```python
 from flask import flash
@@ -127,7 +127,7 @@ In Templates kannst du diese Meldungen ausgeben (siehe Jinja-Bereich).
 
 ### 1.8 `session`
 
-Ein Cookie-basiertes Dictionary, das ueber Requests hinweg pro User erhalten bleibt.
+Ein Cookie-basiertes Dictionary, das über Requests hinweg pro User erhalten bleibt.
 
 > **Analogie:** Ein Festival-Armband — der Server erkennt dich wieder, ohne dass du dich bei jedem Schritt neu identifizieren musst.
 
@@ -138,9 +138,9 @@ from flask import session
 session["user_id"] = 42
 
 # Lesen
-uid = session.get("user_id")   # gibt None zurueck, wenn nicht vorhanden
+uid = session.get("user_id")   # gibt None zurück, wenn nicht vorhanden
 
-# Alles loeschen
+# Alles löschen
 session.clear()
 ```
 
@@ -151,7 +151,7 @@ import os
 app.config["SECRET_KEY"] = os.environ.get("SECRET_KEY")
 ```
 
-### 1.9 Decorators (Routen schuetzen)
+### 1.9 Decorators (Routen schützen)
 
 ```python
 from functools import wraps
@@ -176,7 +176,7 @@ def dashboard():
     return render_template("dashboard.html")
 ```
 
-> **Analogie:** Ein Tuersteher im Club — er checkt deinen Ausweis (Session), bevor du rein darfst.
+> **Analogie:** Ein Türsteher im Club — er checkt deinen Ausweis (Session), bevor du rein darfst.
 
 ### 1.10 Umgebungsvariablen mit `python-dotenv`
 
@@ -194,13 +194,94 @@ secret = os.environ.get("SECRET_KEY")      # Wert verwenden
 SECRET_KEY=some-random-string
 ```
 
+### 1.11 Query-Parameter (URL-Query-Strings)
+
+Ein **Query-String** ist der Teil einer URL nach dem `?`. Er übergibt Schlüssel-Wert-Paare an den Server, ohne ein Formular oder POST zu benötigen.
+
+> **Analogie:** Query-Parameter sind wie Klebezettel auf einem Brief — sie fügen Zusatzinfos hinzu ("welches Produkt?", "welche Seite?"), ohne die Adresse selbst zu ändern.
+
+**Aufbau einer URL:**
+
+```
+/search?product=Milch&page=2
+         \___________/ \____/
+          Parameter 1   Parameter 2
+```
+
+**Query-Parameter in Flask auslesen:**
+
+```python
+from flask import request
+
+@app.route("/search")
+def search():
+    product = request.args.get("product")          # "Milch"
+    page    = request.args.get("page", 1, type=int) # 2 (als int, Standard 1)
+    return render_template("search.html", product=product, page=page)
+```
+
+- `request.args` ist ein dict-ähnliches Objekt mit allen `?key=value`-Paaren.
+- `.get(key, default, type=)` — gibt den Standardwert zurück, falls der Key fehlt, und kann den Typ automatisch umwandeln.
+
+**Mehrere Parameter:**
+
+```python
+# URL: /catalog?category=fruit&sort=calories&order=asc
+category = request.args.get("category")   # "fruit"
+sort_by  = request.args.get("sort")       # "calories"
+order    = request.args.get("order")      # "asc"
+```
+
+**URLs mit Query-Strings bauen — `url_for`:**
+
+```python
+from flask import url_for
+
+# Erzeugt: /search?product=Milch&page=2
+url_for("search", product="Milch", page=2)
+```
+
+Jedes Keyword-Argument, das **kein** Routen-Parameter ist, wird automatisch zum Query-Parameter.
+
+**Links mit Query-Strings im Template (Jinja):**
+
+```html
+<!-- Statischer Link -->
+<a href="/search?product=Milch">Suche nach Milch</a>
+
+<!-- Dynamischer Link mit url_for (empfohlen) -->
+<a href="{{ url_for('search', product='Milch') }}">Suche nach Milch</a>
+
+<!-- Mit einer Variable -->
+<a href="{{ url_for('search', product=item_name) }}">{{ item_name }}</a>
+```
+
+**Weiterleiten mit Query-Parametern:**
+
+```python
+return redirect(url_for("search", product="Milch"))
+# Browser geht zu /search?product=Milch
+```
+
+**Häufige Muster:**
+
+| Anwendungsfall | Beispiel-URL | Flask-Code |
+|----------------|-------------|------------|
+| Suche | `/search?q=apple` | `request.args.get("q")` |
+| Paginierung | `/catalog?page=3` | `request.args.get("page", 1, type=int)` |
+| Filtern | `/catalog?category=fruit` | `request.args.get("category")` |
+| Sortieren | `/catalog?sort=name&order=asc` | `request.args.get("sort")` |
+| Produktdetail | `/detail?product=Milch` | `request.args.get("product")` |
+
+> **Tipp:** Query-Parameter sind in der Adressleiste sichtbar — übergib niemals Passwörter oder sensible Daten so. Nutze dafür POST + Formularfelder.
+
 ---
 
 ## 2. Jinja2-Templating
 
-> **Analogie:** Jinja ist wie ein *Serienbrief*. Du schreibst eine Vorlage mit Platzhaltern, und Jinja fuellt sie mit Daten aus Python.
+> **Analogie:** Jinja ist wie ein *Serienbrief*. Du schreibst eine Vorlage mit Platzhaltern, und Jinja füllt sie mit Daten aus Python.
 
-### 2.1 Syntax-Ueberblick
+### 2.1 Syntax-Überblick
 
 | Syntax | Zweck | Beispiel |
 |--------|------|----------|
@@ -249,7 +330,7 @@ SECRET_KEY=some-random-string
 </ul>
 ```
 
-Nuetzliche Loop-Variablen:
+Nützliche Loop-Variablen:
 
 | Variable | Bedeutung |
 |----------|-----------|
@@ -316,13 +397,13 @@ Nuetzliche Loop-Variablen:
 {{ item.product.nutriments['energy-kcal_100g'] | default('N/A') }}
 ```
 
-Nutze Klammer-Syntax bei Schluesseln mit Bindestrich/Sonderzeichen.
+Nutze Klammer-Syntax bei Schlüsseln mit Bindestrich/Sonderzeichen.
 
 ---
 
 ## 3. Werkzeug Security
 
-> **Analogie:** Die Passwort-Tools aus Werkzeug sind wie ein *Bankschliessfach*. `generate_password_hash` schliesst das Passwort sicher weg, `check_password_hash` prueft nur den passenden Schluessel.
+> **Analogie:** Die Passwort-Tools aus Werkzeug sind wie ein *Bankschließfach*. `generate_password_hash` schließt das Passwort sicher weg, `check_password_hash` prüft nur den passenden Schlüssel.
 
 ### 3.1 Passwort hashen
 
@@ -333,10 +414,10 @@ hash_value = generate_password_hash("my_password")
 # ergibt etwa "scrypt:32768:8:1$salt$hash..."
 ```
 
-- **Nie Klartext-Passwoerter speichern.** Immer nur den Hash speichern.
+- **Nie Klartext-Passwörter speichern.** Immer nur den Hash speichern.
 - Jeder Aufruf erzeugt wegen Salt einen anderen Hash, das ist korrekt.
 
-### 3.2 Passwort pruefen
+### 3.2 Passwort prüfen
 
 ```python
 from werkzeug.security import check_password_hash
@@ -379,13 +460,13 @@ else:
     return redirect("/login")
 ```
 
-> **Security-Tipp:** Fuer falsche E-Mail und falsches Passwort dieselbe Fehlermeldung zeigen.
+> **Security-Tipp:** Für falsche E-Mail und falsches Passwort dieselbe Fehlermeldung zeigen.
 
 ---
 
 ## 4. CS50 Python Library
 
-> **Analogie:** Die `cs50`-Library ist wie Stuetzraeder fuers Fahrrad. Du schreibst SQL-Strings, bekommst aber bequeme Python-Dicts zurueck.
+> **Analogie:** Die `cs50`-Library ist wie Stützräder fürs Fahrrad. Du schreibst SQL-Strings, bekommst aber bequeme Python-Dicts zurück.
 
 ### 4.1 Setup
 
@@ -400,7 +481,7 @@ db = SQL("sqlite:///calories.db")
 ### 4.2 SELECT — Daten lesen
 
 ```python
-# Gibt eine Liste von Dicts zurueck
+# Gibt eine Liste von Dicts zurück
 rows = db.execute("SELECT * FROM users WHERE email = ?", email)
 # z. B. [{"id": 1, "email": "a@b.com", "hash": "..."}]
 
@@ -410,7 +491,7 @@ if rows:
     print(user["email"])
 ```
 
-### 4.3 INSERT — Daten einfuegen
+### 4.3 INSERT — Daten einfügen
 
 ```python
 db.execute(
@@ -419,9 +500,9 @@ db.execute(
 )
 ```
 
-Gibt die `id` der neuen Zeile zurueck.
+Gibt die `id` der neuen Zeile zurück.
 
-### 4.4 UPDATE — Daten aendern
+### 4.4 UPDATE — Daten ändern
 
 ```python
 db.execute(
@@ -430,9 +511,9 @@ db.execute(
 )
 ```
 
-Gibt die Anzahl betroffener Zeilen zurueck.
+Gibt die Anzahl betroffener Zeilen zurück.
 
-### 4.5 DELETE — Daten loeschen
+### 4.5 DELETE — Daten löschen
 
 ```python
 db.execute(
@@ -443,17 +524,17 @@ db.execute(
 
 ### 4.6 Parameterisierte Queries (Sicherheit!)
 
-**Immer `?` Platzhalter verwenden** — niemals String-Konkatenation oder f-Strings fuer SQL-Werte.
+**Immer `?` Platzhalter verwenden** — niemals String-Konkatenation oder f-Strings für SQL-Werte.
 
 ```python
 # SICHER — parameterisiert
 db.execute("SELECT * FROM users WHERE email = ?", email)
 
-# GEFAEHRLICH — SQL-Injection-Risiko!
+# GEFÄHRLICH — SQL-Injection-Risiko!
 # db.execute(f"SELECT * FROM users WHERE email = '{email}'")   # NIE SO
 ```
 
-> **Analogie:** Platzhalter sind wie versiegelte Umschlaege. Die Datenbank trennt Struktur (Query) und Inhalt (Werte) sauber.
+> **Analogie:** Platzhalter sind wie versiegelte Umschläge. Die Datenbank trennt Struktur (Query) und Inhalt (Werte) sauber.
 
 ---
 
@@ -468,7 +549,7 @@ db.execute("SELECT * FROM users WHERE email = ?", email)
 | `INTEGER` | Ganze Zahl | `42` |
 | `REAL` | Kommazahl | `3.14` |
 | `TEXT` | String | `'Apple'` |
-| `BLOB` | Binaerdaten | Bilder, Dateien |
+| `BLOB` | Binärdaten | Bilder, Dateien |
 | `NULL` | Kein Wert | `NULL` |
 
 ### 5.2 CREATE TABLE
@@ -491,9 +572,9 @@ CREATE TABLE IF NOT EXISTS foods (
 
 - `PRIMARY KEY AUTOINCREMENT` — erzeugt automatisch eindeutige IDs.
 - `NOT NULL` — Spalte muss immer einen Wert haben.
-- `FOREIGN KEY` — verknuepft Tabellen untereinander.
+- `FOREIGN KEY` — verknüpft Tabellen untereinander.
 
-### 5.3 Haeufige Queries
+### 5.3 Häufige Queries
 
 ```sql
 -- Alle Foods eines Users, alphabetisch sortiert
@@ -502,7 +583,7 @@ SELECT * FROM foods WHERE user_id = 1 ORDER BY name ASC;
 -- Gesamtkalorien heute
 SELECT SUM(calories) AS total FROM foods WHERE user_id = 1;
 
--- Anzahl Eintraege
+-- Anzahl Einträge
 SELECT COUNT(*) AS entries FROM foods WHERE user_id = 1;
 
 -- Teilstring-Suche
@@ -511,14 +592,14 @@ SELECT * FROM foods WHERE name LIKE '%apple%';
 -- Wert updaten
 UPDATE foods SET calories = 100 WHERE id = 5;
 
--- Zeile loeschen
+-- Zeile löschen
 DELETE FROM foods WHERE id = 5;
 
 -- Tabelle droppen
 DROP TABLE IF EXISTS foods;
 ```
 
-### 5.4 Nuetzliche Clauses
+### 5.4 Nützliche Clauses
 
 | Clause | Zweck | Beispiel |
 |--------|------|----------|
@@ -532,7 +613,7 @@ DROP TABLE IF EXISTS foods;
 ### 5.5 JOINs
 
 ```sql
--- Food-Eintraege mit User-E-Mail
+-- Food-Einträge mit User-E-Mail
 SELECT foods.name, foods.calories, users.email
 FROM foods
 JOIN users ON foods.user_id = users.id
@@ -547,7 +628,7 @@ WHERE users.id = 1;
 
 > **Analogie:** HTML ist das *Skelett* einer Webseite. CSS ist Aussehen/Kleidung, JavaScript ist Verhalten/Bewegung.
 
-### 6.1 Dokument-Grundgeruest
+### 6.1 Dokument-Grundgerüst
 
 ```html
 <!doctype html>
@@ -563,11 +644,11 @@ WHERE users.id = 1;
 </html>
 ```
 
-### 6.2 Haeufige Elemente
+### 6.2 Häufige Elemente
 
 | Element | Zweck | Beispiel |
 |---------|-------|----------|
-| `<h1>`–`<h6>` | Ueberschriften | `<h1>Welcome</h1>` |
+| `<h1>`–`<h6>` | Überschriften | `<h1>Welcome</h1>` |
 | `<p>` | Absatz | `<p>Some text.</p>` |
 | `<a>` | Link | `<a href="/about">About</a>` |
 | `<img>` | Bild | `<img src="photo.jpg" alt="A photo">` |
@@ -592,9 +673,9 @@ WHERE users.id = 1;
 ```
 
 Wichtige Attribute:
-- `action` — URL fuer das Senden der Daten.
+- `action` — URL für das Senden der Daten.
 - `method` — `GET` (in URL) oder `POST` (im Body).
-- `name` — Key fuer `request.form.get("name")`.
+- `name` — Key für `request.form.get("name")`.
 - `required` — Browser blockiert leeres Abschicken.
 
 ### 6.4 Input-Typen
@@ -630,14 +711,14 @@ Wichtige Attribute:
 | `<nav>` | Navigation |
 | `<main>` | Hauptinhalt |
 | `<section>` | Thematischer Abschnitt |
-| `<article>` | Eigenstaendiger Inhalt |
-| `<footer>` | Fussbereich |
+| `<article>` | Eigenständiger Inhalt |
+| `<footer>` | Fußbereich |
 
 ---
 
 ## 7. CSS
 
-> **Analogie:** Wenn HTML das Skelett ist, ist CSS die *Garderobe*. Es steuert Farben, Abstaende, Schrift und Layout.
+> **Analogie:** Wenn HTML das Skelett ist, ist CSS die *Garderobe*. Es steuert Farben, Abstände, Schrift und Layout.
 
 ### 7.1 Drei Wege, CSS einzubinden
 
@@ -716,7 +797,7 @@ Jedes Element ist eine Box:
 | `align-items` | `start`, `center`, `stretch` | Auf Querachse |
 | `flex-wrap` | `nowrap`, `wrap` | Umbruch erlauben |
 
-### 7.5 Haeufige CSS-Properties
+### 7.5 Häufige CSS-Properties
 
 ```css
 /* Typografie */
@@ -726,11 +807,11 @@ font-weight: bold;
 text-align: center;
 color: #333;
 
-/* Hintergruende */
+/* Hintergründe */
 background-color: #f5f5f5;
 background: linear-gradient(135deg, #667eea, #764ba2);
 
-/* Groesse */
+/* Größe */
 width: 100%;
 max-width: 600px;
 min-height: 100vh;
@@ -799,7 +880,7 @@ Das Bootstrap-Grid hat **12 Spalten**.
 |--------|-------|
 | `btn-primary` | Blau |
 | `btn-secondary` | Grau |
-| `btn-success` | Gruen |
+| `btn-success` | Grün |
 | `btn-danger` | Rot |
 | `btn-warning` | Gelb |
 | `btn-info` | Cyan |
@@ -863,11 +944,73 @@ Das Bootstrap-Grid hat **12 Spalten**.
 </div>
 ```
 
+### 8.8a Card mit Bild
+
+Mit `card-img-top` platzierst du ein Bild oben in der Card:
+
+```html
+<div class="card">
+  <img src="https://example.com/foto.jpg" class="card-img-top" alt="Produktfoto">
+  <div class="card-body">
+    <h5 class="card-title">Banana</h5>
+    <p class="card-text">105 kcal pro Portion</p>
+    <a href="#" class="btn btn-primary">Hinzufügen</a>
+  </div>
+</div>
+```
+
+- `card-img-top` — positioniert das Bild über dem Card-Body.
+- Immer ein `alt`-Attribut für Barrierefreiheit setzen.
+- Um Bilder gleich hoch zu halten, nutze CSS: `object-fit: contain; height: 200px;`.
+
+### 8.8b Gleich hohe Cards
+
+Wenn Cards im Grid unterschiedlich viel Text haben, werden sie verschieden hoch. Loesung:
+
+1. **`h-100`** auf der `.card` — streckt die Card auf die volle Spaltenhoehe.
+2. **`d-flex flex-column`** auf `.card-body` — macht den Body zur Flex-Spalte.
+3. **`mt-auto`** auf dem Button — schiebt den Button nach unten.
+
+```html
+<div class="col">
+  <div class="card h-100">
+    <img src="..." class="card-img-top" alt="...">
+    <div class="card-body d-flex flex-column">
+      <h5 class="card-title">Produktname</h5>
+      <p class="card-text">Einige Details hier...</p>
+      <a href="#" class="btn btn-primary mt-auto">Hinzufügen</a>
+    </div>
+  </div>
+</div>
+```
+
+> **Warum das funktioniert:** Bootstrap-Grid-Spalten sind standardmäßig gleich hoch (dank Flexbox). `h-100` lässt die Card diese Höhe ausfüllen. `d-flex flex-column` + `mt-auto` drückt den Button nach unten, sodass alle Buttons auf gleicher Linie stehen.
+
+### 8.8c Responsives Card-Grid mit `row-cols-*`
+
+Statt fixem `row-cols-4` nutze responsive Breakpoints, damit Cards auf dem Handy untereinander und auf dem Desktop nebeneinander stehen:
+
+```html
+<div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-3">
+  <!-- Cards hier -->
+</div>
+```
+
+| Klasse | Breakpoint | Spalten | Bildschirm |
+|--------|-----------|---------|------------|
+| `row-cols-1` | Standard | 1 | Handys (< 576px) |
+| `row-cols-sm-2` | >= 576px | 2 | Große Handys / kleine Tablets |
+| `row-cols-md-3` | >= 768px | 3 | Tablets |
+| `row-cols-lg-4` | >= 992px | 4 | Desktops |
+
+- **`g-3`** fügt gleichmäßige Abstände (Gutters) zwischen Cards hinzu, horizontal und vertikal.
+- `g-*` Werte gehen von `0` (kein Abstand) bis `5` (größter Abstand).
+
 ### 8.9 Spacing-Utilities
 
 Muster: `{property}{side}-{size}`
 
-| Buchstabe | Property | Seiten | Groessen |
+| Buchstabe | Property | Seiten | Größen |
 |-----------|----------|--------|----------|
 | `m` | margin | `t` top, `b` bottom, `s` start, `e` end, `x` horizontal, `y` vertikal | `0`–`5`, `auto` |
 | `p` | padding | wie oben | `0`–`5` |
@@ -922,7 +1065,7 @@ Muster: `{property}{side}-{size}`
 
 ```js
 const name = "Alice";    // konstant — nicht neu zuweisen
-let count = 0;           // veraenderbar — neu zuweisbar
+let count = 0;           // veränderbar — neu zuweisbar
 // var ist aelter — lieber const/let
 ```
 
@@ -934,25 +1077,25 @@ function greet(name) {
     return `Hello, ${name}!`;
 }
 
-// Arrow Function (kuerzer)
+// Arrow Function (kürzer)
 const greet = (name) => `Hello, ${name}!`;
 ```
 
 ### 9.4 DOM-Manipulation
 
 ```js
-// Element auswaehlen
+// Element auswählen
 const btn = document.querySelector("#my-button");
 const items = document.querySelectorAll(".item");
 
-// Inhalt aendern
+// Inhalt ändern
 document.querySelector("#title").textContent = "New Title";
 document.querySelector("#box").innerHTML = "<b>Bold</b>";
 
-// Style aendern
+// Style ändern
 document.querySelector("#box").style.display = "none";
 
-// Klassen hinzufuegen/entfernen
+// Klassen hinzufügen/entfernen
 document.querySelector("#box").classList.add("active");
 document.querySelector("#box").classList.remove("active");
 document.querySelector("#box").classList.toggle("active");
@@ -974,7 +1117,7 @@ document.querySelector("form").addEventListener("submit", (event) => {
 
 ### 9.6 Fetch API (AJAX)
 
-> **Analogie:** `fetch` ist wie ein Bote: Anfrage zum Server, Antwort zurueck, ohne Seiten-Reload.
+> **Analogie:** `fetch` ist wie ein Bote: Anfrage zum Server, Antwort zurück, ohne Seiten-Reload.
 
 ```js
 // GET-Request
@@ -1011,7 +1154,7 @@ async function loadFoods() {
 }
 ```
 
-### 9.8 Nuetzliche Array-Methoden
+### 9.8 Nützliche Array-Methoden
 
 ```js
 const nums = [1, 2, 3, 4, 5];
@@ -1035,7 +1178,7 @@ const msg = `${name} has ${cal} calories.`;  // "Apple has 95 calories."
 
 ## 10. Open Food Facts API
 
-> **Analogie:** Open Food Facts ist wie eine *freie Bibliothek fuer Lebensmitteletiketten*. Du gibst einen Barcode, und bekommst Naehrwertinformationen zum Produkt.
+> **Analogie:** Open Food Facts ist wie eine *freie Bibliothek für Lebensmitteletiketten*. Du gibst einen Barcode, und bekommst Nährwertinformationen zum Produkt.
 
 **Basis-URL:** `https://world.openfoodfacts.org/api/v2/`
 
@@ -1078,12 +1221,13 @@ Die Antwort ist JSON. Wichtige Felder liegen unter `data["product"]`:
 | `product.nutriments.energy-kcal_100g` | Kalorien pro 100g | `539` |
 | `product.nutriments.fat_100g` | Fett pro 100g | `30.9` |
 | `product.nutriments.carbohydrates_100g` | Kohlenhydrate pro 100g | `57.5` |
-| `product.nutriments.proteins_100g` | Eiweiss pro 100g | `6.3` |
+| `product.nutriments.proteins_100g` | Eiweiß pro 100g | `6.3` |
 | `product.nutriments.sugars_100g` | Zucker pro 100g | `56.3` |
 | `product.nutriments.salt_100g` | Salz pro 100g | `0.107` |
 | `product.nutriments.fiber_100g` | Ballaststoffe pro 100g | `0` |
-| `product.serving_size` | Portionsgroesse | `"15 g"` |
+| `product.serving_size` | Portionsgröße | `"15 g"` |
 | `product.image_url` | Produktbild-URL | `"https://..."` |
+| `product.image_front_small_url` | Kleines Vorschaubild-URL | `"https://..."` |
 | `product.nutriscore_grade` | Nutri-Score (a-e) | `"e"` |
 | `product.categories_tags` | Kategorien-Liste | `["en:spreads", ...]` |
 | `status` | `1` = gefunden, `0` = nicht gefunden | `1` |
@@ -1131,7 +1275,7 @@ In Jinja:
 {{ item.product.nutriments['energy-kcal_100g'] | default('N/A') }}
 ```
 
-### 10.5 Pruefen, ob Produkt gefunden wurde
+### 10.5 Prüfen, ob Produkt gefunden wurde
 
 ```python
 data = response.json()
@@ -1158,7 +1302,7 @@ except requests.exceptions.RequestException as e:
     flash(f"Network error: {e}", "danger")
 ```
 
-### 10.7 Vollstaendiges Flask-Routen-Beispiel
+### 10.7 Vollständiges Flask-Routen-Beispiel
 
 ```python
 @app.route("/lookup")
@@ -1200,7 +1344,7 @@ def lookup():
 | Flash-Meldung zeigen | Flask | `flash("msg", "category")` |
 | User merken | Flask | `session["user_id"] = id` |
 | Passwort hashen | Werkzeug | `generate_password_hash(pw)` |
-| Passwort pruefen | Werkzeug | `check_password_hash(hash, pw)` |
+| Passwort prüfen | Werkzeug | `check_password_hash(hash, pw)` |
 | SQL ausfuehren | CS50 | `db.execute("SELECT ...", param)` |
 | Variable ausgeben | Jinja | `{{ variable }}` |
 | Bedingung | Jinja | `{% if ... %}...{% endif %}` |
@@ -1212,5 +1356,5 @@ def lookup():
 
 ---
 
-*Dieser Spickzettel wurde als Lernreferenz fuer das CS50 Final Project "Kalorien Zaehler" erstellt.*
+*Dieser Spickzettel wurde als Lernreferenz für das CS50 Final Project "Kalorien Zähler" erstellt.*
 *Assisted by GitHub Copilot. Alle Snippets sind allgemeine Muster — passe sie an und verstehe sie vor der Nutzung.*
