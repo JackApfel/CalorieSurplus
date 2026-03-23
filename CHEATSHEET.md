@@ -194,6 +194,87 @@ secret = os.environ.get("SECRET_KEY")      # use the value
 SECRET_KEY=some-random-string
 ```
 
+### 1.11 Query Parameters (URL Query Strings)
+
+A **query string** is the part of a URL after the `?`. It passes key-value pairs to the server without needing a form or POST request.
+
+> **Analogy:** Query parameters are like sticky notes on a letter — they add extra information ("which product?", "which page?") without changing the address itself.
+
+**URL anatomy:**
+
+```
+/search?product=Milch&page=2
+         \___________/ \____/
+          param 1       param 2
+```
+
+**Reading query parameters in Flask:**
+
+```python
+from flask import request
+
+@app.route("/search")
+def search():
+    product = request.args.get("product")          # "Milch"
+    page    = request.args.get("page", 1, type=int) # 2 (as int, default 1)
+    return render_template("search.html", product=product, page=page)
+```
+
+- `request.args` is a dict-like object with all `?key=value` pairs.
+- `.get(key, default, type=)` — returns the default if the key is missing and can auto-convert the type.
+
+**Multiple parameters:**
+
+```python
+# URL: /catalog?category=fruit&sort=calories&order=asc
+category = request.args.get("category")   # "fruit"
+sort_by  = request.args.get("sort")       # "calories"
+order    = request.args.get("order")      # "asc"
+```
+
+**Building URLs with query strings using `url_for`:**
+
+```python
+from flask import url_for
+
+# Generates: /search?product=Milch&page=2
+url_for("search", product="Milch", page=2)
+```
+
+Any keyword argument that is **not** a route variable becomes a query parameter automatically.
+
+**Creating links with query strings in templates (Jinja):**
+
+```html
+<!-- Static link -->
+<a href="/search?product=Milch">Search for Milch</a>
+
+<!-- Dynamic link with url_for (preferred) -->
+<a href="{{ url_for('search', product='Milch') }}">Search for Milch</a>
+
+<!-- Using a variable -->
+<a href="{{ url_for('search', product=item_name) }}">{{ item_name }}</a>
+```
+
+**Redirecting with query parameters:**
+
+```python
+return redirect(url_for("search", product="Milch"))
+# Browser goes to /search?product=Milch
+```
+
+**Common patterns:**
+
+| Use Case | Example URL | Flask Code |
+|----------|-------------|------------|
+| Search | `/search?q=apple` | `request.args.get("q")` |
+| Pagination | `/catalog?page=3` | `request.args.get("page", 1, type=int)` |
+| Filtering | `/catalog?category=fruit` | `request.args.get("category")` |
+| Sorting | `/catalog?sort=name&order=asc` | `request.args.get("sort")` |
+| Product detail | `/detail?product=Milch` | `request.args.get("product")` |
+
+> **Tip:** Query parameters are visible in the URL bar — never pass passwords or sensitive data this way. Use POST + form fields for that.
+
 ---
 
 ## 2. Jinja2 Templating

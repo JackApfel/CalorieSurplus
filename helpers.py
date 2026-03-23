@@ -1,7 +1,7 @@
 from functools import wraps
-
+from cs50 import SQL
 from flask import redirect, session
-
+db = SQL("sqlite:///calories.db")
 
 def login_required(f):
     """
@@ -19,6 +19,10 @@ def login_required(f):
 
     @wraps(f)
     def decorated_function(*args, **kwargs):
+        user_id = db.execute("SELECT id FROM users WHERE id = ?", session.get("user_id"))
+        if not user_id:
+            return redirect("/login")
+        print(user_id)
         if session.get("user_id") is None:
             return redirect("/login")
         return f(*args, **kwargs)
