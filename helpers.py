@@ -22,7 +22,6 @@ def login_required(f):
         user_id = db.execute("SELECT id FROM users WHERE id = ?", session.get("user_id"))
         if not user_id:
             return redirect("/login")
-        print(user_id)
         if session.get("user_id") is None:
             return redirect("/login")
         return f(*args, **kwargs)

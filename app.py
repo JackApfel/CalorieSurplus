@@ -34,8 +34,9 @@ def index():
         db.execute("INSERT INTO foods (name, calories, barcode, user_id) VALUES(?,?,?,?)", name, calories, barcode, session["user_id"])
         return redirect("/")
     else:
-        return render_template("index.html", user_id=session.get("user_id"))
+        foods = db.execute("SELECT * FROM foods WHERE user_id = ?", session['user_id'])
 
+        return render_template("index.html", foods=foods)
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
@@ -141,10 +142,13 @@ def catalog():
             data = response.json()
         except requests.exceptions.Timeout:
             flash("The food database took too long to respond. Please try again.", "danger")
-            return redirect("/")
+            return redirect("/catalog")
+        except requests.exceptions.HTTPError as e:
+            flash(f"Food database returned an error (HTTP {e.response.status_code}). Please try again later.", "danger")
+            return redirect("/catalog")
         except requests.exceptions.RequestException:
             flash("Could not reach the food database. Please try again later.", "danger")
-            return redirect("/")
+            return redirect("/catalog")
 
         return render_template("catalog.html", item=data, search_term=search_term)
     else:
