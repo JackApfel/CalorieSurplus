@@ -1,0 +1,37 @@
+Nutzer geht auf GET /catalog
+
+->
+
+Es wird eine Suchprompt angezeigt
+
+->
+
+nutzer gibt ein produkt namen ein und drückt enter
+
+->
+
+Nutzer wird mit POST an /catalog geleite
+
+->
+
+im backend POST /catalog -> wir holen den produkt namen und speichern in einer variable und checken ob es sicht um einen String handelt -> Wir bereiten eine GET request an die open food facts API for mit dem product_name als variable und nur Spezifischen felder wie Name, Brand, kCal/100g als parameter -> (die antword von JSON zu einem Python dict umwandeln und auslesen (lieber doch nicht)) die Json zu einerm Python Dictonary umwandeln -> render_template catalog.html mit dem dictonary als parameter
+
+->
+
+in Jinja/catalog.html -> durch das dict loopen und für jedes Produkt eine Card samt form und submit button erstellen -> wenn der User auf den Button drückt wird jenes Product an POST / gesendet
+
+->
+
+im backend POST / -> Schauen im dict ist das ans backend gesendet worden ist -> SQL query erstellen und name, brand, kcal/100g und datum abspeichern -> redirect an GET /
+
+->
+
+im backend GET / -> infos aus der Datenbank in einem Dictonary oder so Speichern, render_template mit dem dict als parameter
+
+->
+
+in jinja/index.html -> durch die dictonary einträge loopen und einen HTML Table mit allen einträgen erstellen.
+
+->
+
+TODO: alles andere

@@ -5,6 +5,20 @@
 {% block content %}
 <div class="container mt-5 text-center">
     <h1>Calorie Tracker</h1>
-    <h1>Session: user_id = {{user_id}}</h1>
-    <p>TODO</p>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th scope="col">Name</th>
+                <th scope="col">Calories</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for food in foods %}
+            <tr>
+                <td>{{food.name}}</td>
+                <td>{{food.calories}}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
 {% endblock %}

@@ -11,32 +11,21 @@
   <body class="d-flex flex-column min-vh-100">
     <header>
       <div class="alert alert-primary" role="alert">
-
-        <!-- with help from copilot  -->
-        {% with messages = get_flashed_messages(with_categories=true) %}
-          {% if messages %}
-            {% for category, message in messages %}
-              <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
-                {{ message }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-              </div>
-            {% endfor %}
-          {% endif %}
-        {% endwith %}
-
-      <!-- Moved nav inside header for better structure -->
-      <!-- Removed bg-body-tertiary and rounded-3, and applied background color to the nav directly -->
-      <nav class="navbar navbar-expand-lg shadow-sm" data-bs-theme="light">
-        <div class="container-fluid">
-        <a class="navbar-brand" href="/">Calorie Tracker</a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-          <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarSupportedContent">
-          <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-            <li class="nav-item">
-              <a class="nav-link active" aria-current="page" href="/">Home</a>
-            </li>
+        
+        <!-- First made by Copilot, but then i re did it with the help of the Flask Documentation  -->
+        
+        <!-- From the Bootstrap Docs-->
+        <nav class="navbar navbar-expand-lg shadow-sm" data-bs-theme="light">
+          <div class="container-fluid">
+            <a class="navbar-brand" href="/">Calorie Tracker</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+              <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+              <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <li class="nav-item">
+                  <a class="nav-link active" aria-current="page" href="/">Home</a>
+                </li>
             <li class="nav-item">
               <a class="nav-link" href="/catalog">Catalog</a>
             </li>
@@ -56,6 +45,7 @@
         </div>
       </div>
     </nav>
+  </header>
 
     <main class="flex-grow-1">
       <!-- Content goes here -->
