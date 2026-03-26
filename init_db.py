@@ -1,14 +1,13 @@
-from cs50 import SQL
 import sys
 from pathlib import Path
 
+from cs50 import SQL
 
 if len(sys.argv) < 2:
-    print("-h --help for this text\n-c --create will create the .db file and setup Tables\n-d --drop will drop and create entirely new tables (all information WILL be lost!)")
+    print(
+        "-h --help for this text\n-c --create will create the .db file and setup Tables\n-d --drop will drop and create entirely new tables (all information WILL be lost!)"
+    )
     sys.exit()
-
-
-
 
 
 def create():
@@ -17,8 +16,13 @@ def create():
 
     db = SQL("sqlite:///calories.db")
 
-    db.execute("CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY AUTOINCREMENT, email TEXT NOT NULL, hash TEXT NOT NULL, created_at TEXT DEFAULT CURRENT_TIMESTAMP)")
-    db.execute("CREATE TABLE IF NOT EXISTS foods (name TEXT NOT NULL, calories TEXT NOT NULL, user_id INTEGER NOT NULL, barcode INTEGER NOT NULL, created_at TEXT DEFAULT CURRENT_TIMESTAMP, FOREIGN KEY(user_id) REFERENCES users(id))")
+    db.execute(
+        "CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY AUTOINCREMENT, email TEXT NOT NULL, hash TEXT NOT NULL, created_at TEXT DEFAULT CURRENT_TIMESTAMP)"
+    )
+    db.execute(
+        "CREATE TABLE IF NOT EXISTS foods (name TEXT NOT NULL, product_calories, consumed_calories TEXT NOT NULL, user_id INTEGER NOT NULL, barcode INTEGER NOT NULL, grams INTEGER NOT NULL, created_at TEXT DEFAULT CURRENT_TIMESTAMP, FOREIGN KEY(user_id) REFERENCES users(id))"
+    )
+
 
 def drop():
     Path("calories.db").touch(exist_ok=True)
@@ -30,10 +34,12 @@ def drop():
     create()
 
 
-# match syntax was found on StackOverflow when searching for a switch like statement in Python 
+# match syntax was found on StackOverflow when searching for a switch like statement in Python
 match sys.argv[1]:
     case "-h" | "--help":
-        print("-h --help for this text\n-c --create will create the .db file and setup Tables\n-d --drop will drop and create entirely new tables (all information WILL be lost!)")
+        print(
+            "-h --help for this text\n-c --create will create the .db file and setup Tables\n-d --drop will drop and create entirely new tables (all information WILL be lost!)"
+        )
 
     case "-c" | "--create":
         create()

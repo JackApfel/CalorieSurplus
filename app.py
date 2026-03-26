@@ -1,10 +1,10 @@
 import os
 
+import requests
 from cs50 import SQL
 from dotenv import load_dotenv
 from flask import Flask, flash, redirect, render_template, request, session
 from werkzeug.security import check_password_hash, generate_password_hash
-import requests
 
 import helpers
 
@@ -28,15 +28,57 @@ db = SQL("sqlite:///calories.db")
 def index():
     if request.method == "POST":
         name = request.form.get("name")
-        calories = request.form.get("calories")
+        calories = request.form.get("product_calories")
         barcode = request.form.get("code")
+        grams = request.form.get("grams")
 
-        db.execute("INSERT INTO foods (name, calories, barcode, user_id) VALUES(?,?,?,?)", name, calories, barcode, session["user_id"])
+        print(f"name: {name}")
+        print(f"calories: {calories}")
+        print(f"barcode: {barcode}")
+        print(f"grams: {grams}")
+
+        if not calories or not name or not barcode or not grams:
+            flash("Empty field/s", "danger")
+            return redirect("/")
+
+        try:
+            calories = int(calories)
+            grams = int(grams)
+        except ValueError as e:
+            flash(f"A field is not a number! {e}", "danger")
+            return redirect("/")
+
+        db.execute(
+            "INSERT INTO foods (name, product_calories, consumed_calories, barcode, grams, user_id) VALUES(?,?,?,?,?,?)",
+            name,
+            calories,
+            (calories / 100) * grams,
+            barcode,
+            grams,
+            session["user_id"],
+        )
         return redirect("/")
     else:
-        foods = db.execute("SELECT * FROM foods WHERE user_id = ?", session['user_id'])
+        foods = db.execute("SELECT * FROM foods WHERE user_id = ?", session["user_id"])
 
-        return render_template("index.html", foods=foods)
+        # Calculate total calories for the day
+        daily_calories = db.execute(
+            "SELECT SUM(consumed_calories) AS daily_calories FROM foods WHERE user_id = ? AND DATE(created_at) = DATE('now')",
+            session["user_id"],
+        )
+
+        weekly_calories = db.execute(
+            "SELECT SUM(consumed_calories) AS weekly_calories FROM foods WHERE user_id = ? AND DATE(created_at) >= DATE('now', '-7 days')",
+            session["user_id"],
+        )
+
+        return render_template(
+            "index.html",
+            foods=foods,
+            daily_calories=daily_calories,
+            weekly_calories=weekly_calories,
+        )
+
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
@@ -114,7 +156,6 @@ def logout():
         return render_template("logout.html")
 
 
-
 @app.route("/catalog", methods=["GET", "POST"])
 @helpers.login_required
 def catalog():
@@ -141,13 +182,21 @@ def catalog():
             response.raise_for_status()
             data = response.json()
         except requests.exceptions.Timeout:
-            flash("The food database took too long to respond. Please try again.", "danger")
+            flash(
+                "The food database took too long to respond. Please try again.",
+                "danger",
+            )
             return redirect("/catalog")
         except requests.exceptions.HTTPError as e:
-            flash(f"Food database returned an error (HTTP {e.response.status_code}). Please try again later.", "danger")
+            flash(
+                f"Food database returned an error (HTTP {e.response.status_code}). Please try again later.",
+                "danger",
+            )
             return redirect("/catalog")
         except requests.exceptions.RequestException:
-            flash("Could not reach the food database. Please try again later.", "danger")
+            flash(
+                "Could not reach the food database. Please try again later.", "danger"
+            )
             return redirect("/catalog")
 
         return render_template("catalog.html", item=data, search_term=search_term)

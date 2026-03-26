@@ -1,24 +1,29 @@
-{% extends "layout.html" %}
-
-{% block title %}Home{% endblock %}
-
-{% block content %}
+{% extends "layout.html" %} {% block title %}Home{% endblock %} {% block content %}
 <div class="container mt-5 text-center">
-    <h1>Calorie Tracker</h1>
-    <table class="table table-striped">
-        <thead>
-            <tr>
-                <th scope="col">Name</th>
-                <th scope="col">Calories</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for food in foods %}
-            <tr>
-                <td>{{food.name}}</td>
-                <td>{{food.calories}}</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-{% endblock %}
+  <h1>Calorie Tracker</h1>
+  <h2>Calories Today: {{daily_calories[0].daily_calories | default(0, true)}}</h2>
+  <h2>Calories Last 7 Days: {{weekly_calories[0].weekly_calories | default(0, true)}}</h2>
+  <table class="table table-striped">
+    <thead>
+      <tr>
+        <th scope="col">Name</th>
+        <th scope="col">Consumed Grams</th>
+        <th scope="col">Consumed Calories</th>
+        <th scope="col">kcal/100</th>
+        <th scope="col">Date</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for food in foods %}
+      <tr>
+        <td>{{food.name}}</td>
+        <td>{{food.grams}}</td>
+        <td>{{food.consumed_calories}}</td>
+        <td>{{food.product_calories}}</td>
+        <td>{{food.created_at}}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% endblock %}
+</div>

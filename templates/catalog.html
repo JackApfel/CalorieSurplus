@@ -1,43 +1,71 @@
 {% extends "layout.html" %} {% block title %}Catalog{% endblock %} {% block content %}
-<div class="container mt-5 text-center">
-</div>
+<div class="container mt-5 text-center"></div>
 <!--Build with the CHEATSHEET as reference-->
 <div class="container mt-5 text-center">
   <h1>Search Product</h1>
 </div>
-<form action="/catalog" method="POST" class="mb-5">
-  <div class="mb-1">
-    <label for="search">search item</label>
-    <input type="text" class="form-control" id="search" name="search">
-  </div>
-  <button type="submit" class="btn btn-primary">Search</button>
-</form>
 
+<div class="container mt-5 text-center">
+  <form action="/catalog" method="POST" class="mb-5">
+    <div class="mb-1">
+      <label for="search">search item</label>
+      <input type="text" class="form-control" id="search" name="search" />
+    </div>
+    <button type="submit" class="btn btn-primary">Search</button>
+  </form>
+</div>
 <div class="container">
   <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-3">
-    {% if item %}
-    {% for data in item.products %}
+    {% if item %} {% for data in item.products %}
     <form action="/" method="POST">
       <div class="col mb-3 d-flex flex-column justify-content-end">
         <div class="card rounded">
-          <img src="{{data.image_front_small_url}}" alt="{{data.product_name | default('Unknown')}}" style="max-width: 50%; height: auto;" class="img-thumbnail rounded">
+          <img
+            src="{{data.image_front_small_url}}"
+            alt="{{data.product_name | default('Unknown')}}"
+            style="max-width: 50%; height: auto"
+            class="img-thumbnail rounded"
+          />
           <div class="card-body d-flex flex-column justify-content-end">
             <p class="h5 card-title">{{data.product_name | default("Unknown")}}</p>
             <ul>
               <li><p class="card-text">Brand: {{data.brands | default("Unknown")}}</p></li>
-              <li><p class="card-text">Calories per 100g: <strong>{{ (data.nutriments or {})['energy-kcal_100g'] | default('N/A') }}</strong></p></li>
+              <li>
+                <p class="card-text">
+                  Calories per 100g:
+                  <strong
+                    >{{ (data.nutriments or {})['energy-kcal_100g'] | default('N/A') }}</strong
+                  >
+                </p>
+              </li>
             </ul>
-            <input type="hidden" name="name" value="{{ data.product_name | default('Unknown') }}">
-            <input type="hidden" name="calories" value="{{ (data.nutriments or {})['energy-kcal_100g'] | default('N/A') }}">
-            <input type="hidden" name="code" value="{{ data.code | default('Unknown') }}">
-            
+            <input
+              type="hidden"
+              name="name"
+              value="{{ data.product_name | default('Unknown') }}"
+              required
+            />
+            <input
+              type="hidden"
+              name="product_calories"
+              value="{{ (data.nutriments or {})['energy-kcal_100g'] | default('N/A') }}"
+              required
+            />
+            <input
+              type="hidden"
+              name="code"
+              value="{{ data.code | default('Unknown') }}"
+              required
+            />
+
+            <input type="number" name="grams" required />
+
             <button type="submit" class="btn btn-primary">Add</button>
           </div>
         </div>
       </div>
     </form>
-    {% endfor %}
-    {% endif %}
+    {% endfor %} {% endif %}
   </div>
 </div>
 {% endblock %}
