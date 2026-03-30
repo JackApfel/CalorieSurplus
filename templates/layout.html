@@ -59,23 +59,21 @@
         </div>
       </nav>
       <!-- First made by Copilot, but then i re did it with the help of the Flask and Bootstrap Documentation  -->
+      {% with messages = get_flashed_messages(with_categories=true) %} {% if messages %}
       <div>
-        {% with messages = get_flashed_messages() %} {% if messages %}
-        <div class="alert alert-warning alert-dismissible fade show" role="alert">
+        {% for category, message in messages %}
+        <div class="alert alert-{{category}} alert-dismissible fade show" role="alert">
           <button
             type="button"
             class="btn-close"
             data-bs-dismiss="alert"
             aria-label="Close"
           ></button>
-          <ul class="flashes">
-            {% for message in messages %}
-            <li>{{ message }}</li>
-            {% endfor %}
-          </ul>
+          <li>{{ message }}</li>
         </div>
-        {% endif %} {% endwith %}
+        {% endfor %}
       </div>
+      {% endif %} {% endwith %}
     </header>
 
     <main class="flex-grow-1">
