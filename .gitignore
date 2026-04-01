@@ -1,3 +1,33 @@
+# Git ignore configuration
+# Assisted by GitHub Copilot while setting up project defaults
+
 .env
 calories.db
 .venv
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+dist/
+build/
+.pytest_cache/
+.coverage
+htmlcov/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Local development
+local_settings.py
