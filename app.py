@@ -237,3 +237,12 @@ def history():
 
     else:
         return render_template("history.html")
+
+
+@app.route("/preference", methods=["GET", "POST"])
+@helpers.login_required
+def preference():
+    if request.method == "POST":
+        return "POST"
+    else:
+        return "GET"
