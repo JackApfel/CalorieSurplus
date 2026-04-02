@@ -42,8 +42,8 @@ def index():
             return redirect("/")
 
         try:
-            calories = int(calories)
-            grams = int(grams)
+            calories = int(float(calories))
+            grams = int(float(grams))
         except ValueError as e:
             flash(f"A field is not a number! {e}", "danger")
             return redirect("/")
@@ -159,15 +159,14 @@ def logout():
 @app.route("/catalog", methods=["GET", "POST"])
 @helpers.login_required
 def catalog():
-
     if request.method == "POST":
         search_term = str(request.form.get("search"))
         params = {
             "search_terms": search_term,
             "json": "true",
-            "page_size": 8,
+            "page_size": 2,
             # Only request the fields we actually need — massively reduces response size and latency
-            "fields": "product_name,brands,nutriments,image_front_small_url,code",
+            "fields": "product_name,brands,nutriments,image_front_small_url,code,quantity",
         }
 
         headers = {
@@ -199,6 +198,7 @@ def catalog():
             )
             return redirect("/catalog")
 
+        print(f"Data: {data}")
         return render_template("catalog.html", item=data, search_term=search_term)
     else:
         return render_template("catalog.html")
