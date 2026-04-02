@@ -1,3 +1,5 @@
 .env
 calories.db
 .venv
+__pycache__/
+*.py[cod]
