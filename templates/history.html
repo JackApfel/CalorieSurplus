@@ -1,0 +1,36 @@
+{% extends "layout.html" %} {% block title %}Home{% endblock %} {% block content %}
+<form action="/history" method="POST">
+  {% if date %}
+  <input name="date" type="date" value="{{date}}" required />
+  {%else%}
+  <input name="date" type="date" required />
+  {%endif%}
+  <button type="submit">submit</button>
+</form>
+
+<p class="h3">
+  Total calories consumed: {{total_calories[0].total_calories | default("0", true)}} kcal
+</p>
+<table class="table table-striped">
+  <thead>
+    <tr>
+      <th scope="col">Name</th>
+      <th scope="col">Consumed Grams</th>
+      <th scope="col">Consumed Calories</th>
+      <th scope="col">kcal/100</th>
+      <th scope="col">Date</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for food in foods %}
+    <tr>
+      <td>{{food.name}}</td>
+      <td>{{food.grams}}</td>
+      <td>{{food.consumed_calories}}</td>
+      <td>{{food.product_calories}}</td>
+      <td>{{food.created_at}}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

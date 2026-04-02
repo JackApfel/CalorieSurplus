@@ -20,7 +20,7 @@ def create():
         "CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY AUTOINCREMENT, email TEXT NOT NULL, hash TEXT NOT NULL, created_at TEXT DEFAULT CURRENT_TIMESTAMP)"
     )
     db.execute(
-        "CREATE TABLE IF NOT EXISTS foods (name TEXT NOT NULL, product_calories, consumed_calories TEXT NOT NULL, user_id INTEGER NOT NULL, barcode INTEGER NOT NULL, grams INTEGER NOT NULL, created_at TEXT DEFAULT CURRENT_TIMESTAMP, FOREIGN KEY(user_id) REFERENCES users(id))"
+        "CREATE TABLE IF NOT EXISTS foods (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT NOT NULL, product_calories INTEGER NOT NULL, consumed_calories INTEGER NOT NULL, user_id INTEGER NOT NULL, barcode INTEGER NOT NULL, grams INTEGER NOT NULL, created_at TEXT DEFAULT CURRENT_TIMESTAMP, FOREIGN KEY(user_id) REFERENCES users(id))"
     )
 
 

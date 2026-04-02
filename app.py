@@ -202,3 +202,53 @@ def catalog():
         return render_template("catalog.html", item=data, search_term=search_term)
     else:
         return render_template("catalog.html")
+
+
+@app.route("/history", methods=["GET", "POST"])
+@helpers.login_required
+def history():
+    if request.method == "POST":
+        date = request.form.get("date")
+
+        try:
+            products = db.execute(
+                "SELECT * FROM foods WHERE user_id = ? AND date(created_at) = ?",
+                session["user_id"],
+                date,
+            )
+
+            total_calories = db.execute(
+                "SELECT sum(consumed_calories) as total_calories FROM foods WHERE user_id = ? AND date(created_at) = ?",
+                session["user_id"],
+                date,
+            )
+
+            if not total_calories:
+                return render_template(
+                    "history.html",
+                    foods=products,
+                    date=date,
+                    total_calories=[{"total_calories": 0}],
+                )
+
+        except Exception as e:
+            flash(
+                f"Database encountered an error: {e}",
+                "danger",
+            )
+
+        return render_template(
+            "history.html", foods=products, date=date, total_calories=total_calories
+        )
+
+    else:
+        return render_template("history.html", total_calories=[{"total_calories": 0}])
+
+
+@app.route("/preference", methods=["GET", "POST"])
+@helpers.login_required
+def preference():
+    if request.method == "POST":
+        return "POST"
+    else:
+        return "GET"
