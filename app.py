@@ -251,4 +251,4 @@ def preference():
     if request.method == "POST":
         return "POST"
     else:
-        return "GET"
+        return render_template("preference.html")

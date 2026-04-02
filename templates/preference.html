@@ -1,5 +1,10 @@
-{% extends "layout.html"%}
-{% block titel %} {% endblock %}
-{% block content %}
+{% extends "layout.html"%} {% block titel %} {% endblock %} {% block content %}
+<div>
+  <form>
+    <label for="calorie_goal" class="form-label">Define your daily Calorie goal!</label>
+    <input name="calorie_goal" type="number" placeholder="2000" />
 
+    <button type="submit" class="btn btn-primary">Save Preference</button>
+  </form>
+</div>
 {% endblock %}
