@@ -164,7 +164,7 @@ def catalog():
         params = {
             "search_terms": search_term,
             "json": "true",
-            "page_size": 2,
+            "page_size": 8,
             # Only request the fields we actually need — massively reduces response size and latency
             "fields": "product_name,brands,nutriments,image_front_small_url,code,quantity",
         }
@@ -249,6 +249,25 @@ def history():
 @helpers.login_required
 def preference():
     if request.method == "POST":
-        return "POST"
+        calorie_goal_form = request.form.get("calorie_goal")
+        if not calorie_goal_form:
+            return "SEGS"
+        try:
+            calorie_goal = int(calorie_goal_form)
+        except ValueError:
+            flash(
+                "Input was not a number!",
+                "danger",
+            )
+            return redirect("/preference")
+
+        # Copilot helped with Syntax for ON CONFLICT and UPDATE
+        db.execute(
+            "INSERT INTO preferences (user_id, calorie_goal) VALUES(?, ?) ON CONFLICT(user_id) DO UPDATE SET calorie_goal = excluded.calorie_goal;",
+            session["user_id"],
+            calorie_goal,
+        )
+
+        return redirect("/preference")
     else:
         return render_template("preference.html")

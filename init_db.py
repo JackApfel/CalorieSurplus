@@ -22,6 +22,9 @@ def create():
     db.execute(
         "CREATE TABLE IF NOT EXISTS foods (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT NOT NULL, product_calories INTEGER NOT NULL, consumed_calories INTEGER NOT NULL, user_id INTEGER NOT NULL, barcode INTEGER NOT NULL, grams INTEGER NOT NULL, created_at TEXT DEFAULT CURRENT_TIMESTAMP, FOREIGN KEY(user_id) REFERENCES users(id))"
     )
+    db.execute(
+        "CREATE TABLE IF NOT EXISTS preferences (id INTEGER PRIMARY KEY AUTOINCREMENT, user_id INTEGER NOT NULL UNIQUE, calorie_goal INTEGER NOT NULL DEFAULT 2000,FOREIGN KEY(user_id) REFERENCES users(id))"
+    )
 
 
 def drop():
@@ -43,6 +46,7 @@ match sys.argv[1]:
 
     case "-c" | "--create":
         create()
+        print("Done!")
     case "-d" | "--drop":
         prompt = input("are you sure? y/n ")
         match prompt:
