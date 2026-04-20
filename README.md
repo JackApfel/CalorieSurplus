@@ -6,7 +6,9 @@
 
 This is a web-application based on Python and Flask, made for making weight gain easier.
 It is a calorie counting app with a vast database of different foods powered by Open Food Facts
+
 It has a Simple UI/UX and is usable across devices.
+
 This project idea came to me because i am myself very underweight, and to help me improve my health; i developed this app.
 
 ## Features

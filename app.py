@@ -119,15 +119,15 @@ def register():
         confirm_password = request.form.get("confirm_password")
 
         if not email or not password or not confirm_password:
-            flash("Email, password, and confirmation are required.", "danger")
+            flash("Email, password, and confirmation are required.", "waring")
             return redirect("/register")
 
         if password != confirm_password:
-            flash("Passwords do not match.", "danger")
+            flash("Passwords do not match.", "warning")
             return redirect("/register")
 
         if db.execute("SELECT * FROM users WHERE email = ?", email):
-            flash("This email is already registered.", "danger")
+            flash("This email is already registered.", "warning")
             return redirect("/register")
 
         hash = generate_password_hash(password)
@@ -137,6 +137,9 @@ def register():
         user_id = db.execute("SELECT id FROM users WHERE email = ?", email)[0]["id"]
 
         session["user_id"] = user_id
+
+        db.execute("INSERT INTO preferences (user_id) VALUES(?);", session["user_id"])
+
         flash("Registration successful. Welcome!", "success")
         return redirect("/")
 
@@ -249,11 +252,12 @@ def history():
 @helpers.login_required
 def preference():
     if request.method == "POST":
-        calorie_goal_form = request.form.get("calorie_goal")
-        if not calorie_goal_form:
-            return "SEGS"
+        daily_calorie_goal_form = request.form.get("daily_calorie_goal")
+        if not daily_calorie_goal_form:
+            flash("Error: Calorie goal is null", "danger")
+            return redirect("/preference")
         try:
-            calorie_goal = int(calorie_goal_form)
+            daily_calorie_goal = int(daily_calorie_goal_form)
         except ValueError:
             flash(
                 "Input was not a number!",
@@ -263,10 +267,13 @@ def preference():
 
         # Copilot helped with Syntax for ON CONFLICT and UPDATE
         db.execute(
-            "INSERT INTO preferences (user_id, calorie_goal) VALUES(?, ?) ON CONFLICT(user_id) DO UPDATE SET calorie_goal = excluded.calorie_goal;",
+            "UPDATE preferences SET calorie_goal = ? WHERE user_id ? ?",
             session["user_id"],
-            calorie_goal,
+            daily_calorie_goal,
         )
+        session["calorie_goal"] = daily_calorie_goal
+
+        print(session["calorie_goal"])
 
         return redirect("/preference")
     else:

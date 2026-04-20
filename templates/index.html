@@ -3,6 +3,18 @@
   <h1>Calorie Tracker</h1>
   <h2>Calories Today: {{daily_calories[0].daily_calories | default(0, true)}}</h2>
   <h2>Calories Last 7 Days: {{weekly_calories[0].weekly_calories | default(0, true)}}</h2>
+  <h3>Calorie Goal: {{session.calorie_goaly}}</h3>
+  <div
+    class="progress"
+    role="progressbar"
+    aria-label="Animated striped example"
+    aria-valuenow="75"
+    aria-valuemin="0"
+    aria-valuemax="100"
+  >
+    <div class="progress-bar progress-bar-striped progress-bar-animated" style="width: 50%"></div>
+  </div>
+  <p>{{(daily_calories[0].daily_calories | default(0, true)) + (1)}}</p>
   <table class="table table-striped">
     <thead>
       <tr>
