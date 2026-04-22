@@ -32,11 +32,6 @@ def index():
         barcode = request.form.get("code")
         grams = request.form.get("grams")
 
-        print(f"name: {name}")
-        print(f"calories: {calories}")
-        print(f"barcode: {barcode}")
-        print(f"grams: {grams}")
-
         if not calories or not name or not barcode or not grams:
             flash("Empty field/s", "danger")
             return redirect("/")
@@ -49,13 +44,14 @@ def index():
             return redirect("/")
 
         db.execute(
-            "INSERT INTO foods (name, product_calories, consumed_calories, barcode, grams, user_id) VALUES(?,?,?,?,?,?)",
+            "INSERT INTO foods (name, product_calories, consumed_calories, barcode, grams, user_id, calorie_goal) VALUES(?,?,?,?,?,?,?)",
             name,
             calories,
             (calories / 100) * grams,
             barcode,
             grams,
             session["user_id"],
+            session["calorie_goal"],
         )
         return redirect("/")
     else:
@@ -106,6 +102,10 @@ def login():
             flash("Invalid email or password.", "danger")
             return redirect("/login")
 
+        calorie_goal = db.execute(
+            "SELECT calorie_goal WHERE user_id = ?", users[0]["id"]
+        )
+        session["calorie_goal"] = calorie_goal[0]["calorie_goal"]
         return redirect("/")
     else:
         return render_template("login.html")
@@ -267,9 +267,9 @@ def preference():
 
         # Copilot helped with Syntax for ON CONFLICT and UPDATE
         db.execute(
-            "UPDATE preferences SET calorie_goal = ? WHERE user_id ? ?",
-            session["user_id"],
+            "UPDATE preferences SET calorie_goal = ? WHERE user_id = ?",
             daily_calorie_goal,
+            session["user_id"],
         )
         session["calorie_goal"] = daily_calorie_goal
 
