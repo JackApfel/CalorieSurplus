@@ -17,29 +17,29 @@ if len(sys.argv) < 2:
 
 def create():
     db.execute(
-        "CREATE TABLE IF NOT EXISTS users (" \
-        "id INTEGER PRIMARY KEY AUTOINCREMENT, " \
-        "email TEXT UNIQUE NOT NULL, " \
-        "hash TEXT NOT NULL, " \
+        "CREATE TABLE IF NOT EXISTS users ("
+        "id INTEGER PRIMARY KEY AUTOINCREMENT, "
+        "email TEXT UNIQUE NOT NULL, "
+        "hash TEXT NOT NULL, "
         "created_at TEXT DEFAULT CURRENT_TIMESTAMP)"
     )
     db.execute(
-        "CREATE TABLE IF NOT EXISTS foods (" \
-        "id INTEGER PRIMARY KEY AUTOINCREMENT, " \
-        "name TEXT NOT NULL, " \
-        "product_calories INTEGER NOT NULL, " \
-        "consumed_calories INTEGER NOT NULL, " \
-        "user_id INTEGER NOT NULL, " \
-        "barcode INTEGER NOT NULL, " \
-        "grams INTEGER NOT NULL, " \
-        "created_at TEXT DEFAULT CURRENT_TIMESTAMP, " \
-        "calorie_goal INTEGER NOT NULL, " \
+        "CREATE TABLE IF NOT EXISTS foods ("
+        "id INTEGER PRIMARY KEY AUTOINCREMENT, "
+        "name TEXT NOT NULL, "
+        "product_calories INTEGER NOT NULL, "
+        "consumed_calories INTEGER NOT NULL, "
+        "user_id INTEGER NOT NULL, "
+        "barcode INTEGER NOT NULL, "
+        "grams INTEGER NOT NULL, "
+        "created_at TEXT DEFAULT CURRENT_TIMESTAMP, "
+        "calorie_goal INTEGER NOT NULL, "
         "FOREIGN KEY(user_id) REFERENCES users(id))"
     )
     db.execute(
-        "CREATE TABLE IF NOT EXISTS preferences (" \
-        "id INTEGER PRIMARY KEY AUTOINCREMENT, user_id INTEGER NOT NULL UNIQUE, " \
-        "calorie_goal INTEGER NOT NULL DEFAULT 2000, " \
+        "CREATE TABLE IF NOT EXISTS preferences ("
+        "id INTEGER PRIMARY KEY AUTOINCREMENT, user_id INTEGER NOT NULL UNIQUE, "
+        "calorie_goal INTEGER NOT NULL DEFAULT 2000, "
         "FOREIGN KEY(user_id) REFERENCES users(id))"
     )
 
@@ -79,10 +79,5 @@ match sys.argv[1]:
                 sys.exit()
             case _:
                 sys.exit()
-    case "-u" | "--update":
-        update()
-        print("Done!")
-        sys.exit()
-
     case _:
         print("use -h or --help for more information")
