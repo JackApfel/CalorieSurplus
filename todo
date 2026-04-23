@@ -37,6 +37,9 @@ in jinja/index.html -> durch die dictonary einträge loopen und einen HTML Table
 User geht auf history.html -> HTML from mit datum auswahl -> nutzer wählt datum -> Senden an POST /history -> Datum auswerden und als 'date' zwischenspeichern -> eine SQLite3 query um alle produkte aus dem 'foods' table zu holen 'date' = 'created_at' (date() funktion nutzen!) ist -> render template mit den produkten als parameter
 
 ->
-TODO NOW
 
 Neue Route /preferences -> in preferences.html kann der User sein Calorie Goal einstellen etc -> Calorie Goal in / und /history anzeigen (progress bar o.Ä?)
+
+->
+
+Aktuelle Calorie Goals mit jeden foods eintrag speichern?

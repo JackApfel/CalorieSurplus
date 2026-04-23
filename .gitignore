@@ -4,6 +4,7 @@
 .env
 calories.db
 .venv
+test.py
 
 # Python
 __pycache__/

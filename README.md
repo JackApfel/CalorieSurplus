@@ -6,7 +6,9 @@
 
 This is a web-application based on Python and Flask, made for making weight gain easier.
 It is a calorie counting app with a vast database of different foods powered by Open Food Facts
+
 It has a Simple UI/UX and is usable across devices.
+
 This project idea came to me because i am myself very underweight, and to help me improve my health; i developed this app.
 
 ## Features
@@ -23,7 +25,8 @@ This project idea came to me because i am myself very underweight, and to help m
 
 ## Installation & Running
 
-- Clone this repository `git clone`
+- Clone this repository `git clone https://github.com/JackApfel/Kalorien-Z-hler.git`
+- Install dependencies `pip install -r requirements.txt`
 - Run `python init_db.py`
 - Create the `.env`
 - Then start with `run flask`
@@ -63,6 +66,8 @@ This Project uses a very simple SQLite database
 
 ## Design Decisions
 
+TODO
+
 ## Known Limitations / Future Work
 
 **Limitation:** The Open Food Facts (OFF) API does not cover all products or self cooked meals.
@@ -72,6 +77,16 @@ This Project uses a very simple SQLite database
 ## Academic Honesty & AI Usage
 
 This project follows CS50's Academic Honesty guidelines.
+
+I did first use AI when starting this project, but soon enough i did realize that it was more of a hindrance then it was helping.
+
+I minimized my AI usage to mostly just be help with Syntax i had forgotten.
+
+AI assisted code is marked via comment.
+
+when AI was used it was this this used with this prompt.md, the prompt file was created by Github Copilot.
 See: `.github/prompts/honesty.prompt.md`.
+
+Also: when working form laptop, every time i save a file all longer lines of code get automatically broken up and indented, i dunno why.
 
 ## Video Demo

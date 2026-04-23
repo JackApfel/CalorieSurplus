@@ -32,11 +32,6 @@ def index():
         barcode = request.form.get("code")
         grams = request.form.get("grams")
 
-        print(f"name: {name}")
-        print(f"calories: {calories}")
-        print(f"barcode: {barcode}")
-        print(f"grams: {grams}")
-
         if not calories or not name or not barcode or not grams:
             flash("Empty field/s", "danger")
             return redirect("/")
@@ -49,13 +44,14 @@ def index():
             return redirect("/")
 
         db.execute(
-            "INSERT INTO foods (name, product_calories, consumed_calories, barcode, grams, user_id) VALUES(?,?,?,?,?,?)",
+            "INSERT INTO foods (name, product_calories, consumed_calories, barcode, grams, user_id, calorie_goal) VALUES(?,?,?,?,?,?,?)",
             name,
             calories,
             (calories / 100) * grams,
             barcode,
             grams,
             session["user_id"],
+            session["calorie_goal"],
         )
         return redirect("/")
     else:
@@ -106,6 +102,10 @@ def login():
             flash("Invalid email or password.", "danger")
             return redirect("/login")
 
+        calorie_goal = db.execute(
+            "SELECT calorie_goal WHERE user_id = ?", users[0]["id"]
+        )
+        session["calorie_goal"] = calorie_goal[0]["calorie_goal"]
         return redirect("/")
     else:
         return render_template("login.html")
@@ -119,15 +119,15 @@ def register():
         confirm_password = request.form.get("confirm_password")
 
         if not email or not password or not confirm_password:
-            flash("Email, password, and confirmation are required.", "danger")
+            flash("Email, password, and confirmation are required.", "waring")
             return redirect("/register")
 
         if password != confirm_password:
-            flash("Passwords do not match.", "danger")
+            flash("Passwords do not match.", "warning")
             return redirect("/register")
 
         if db.execute("SELECT * FROM users WHERE email = ?", email):
-            flash("This email is already registered.", "danger")
+            flash("This email is already registered.", "warning")
             return redirect("/register")
 
         hash = generate_password_hash(password)
@@ -137,6 +137,9 @@ def register():
         user_id = db.execute("SELECT id FROM users WHERE email = ?", email)[0]["id"]
 
         session["user_id"] = user_id
+
+        db.execute("INSERT INTO preferences (user_id) VALUES(?);", session["user_id"])
+
         flash("Registration successful. Welcome!", "success")
         return redirect("/")
 
@@ -164,7 +167,7 @@ def catalog():
         params = {
             "search_terms": search_term,
             "json": "true",
-            "page_size": 2,
+            "page_size": 8,
             # Only request the fields we actually need — massively reduces response size and latency
             "fields": "product_name,brands,nutriments,image_front_small_url,code,quantity",
         }
@@ -249,6 +252,29 @@ def history():
 @helpers.login_required
 def preference():
     if request.method == "POST":
-        return "POST"
+        daily_calorie_goal_form = request.form.get("daily_calorie_goal")
+        if not daily_calorie_goal_form:
+            flash("Error: Calorie goal is null", "danger")
+            return redirect("/preference")
+        try:
+            daily_calorie_goal = int(daily_calorie_goal_form)
+        except ValueError:
+            flash(
+                "Input was not a number!",
+                "danger",
+            )
+            return redirect("/preference")
+
+        # Copilot helped with Syntax for ON CONFLICT and UPDATE
+        db.execute(
+            "UPDATE preferences SET calorie_goal = ? WHERE user_id = ?",
+            daily_calorie_goal,
+            session["user_id"],
+        )
+        session["calorie_goal"] = daily_calorie_goal
+
+        print(session["calorie_goal"])
+
+        return redirect("/preference")
     else:
-        return "GET"
+        return render_template("preference.html")
