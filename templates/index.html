@@ -26,6 +26,7 @@
         <th scope="col">Consumed Calories</th>
         <th scope="col">kcal/100</th>
         <th scope="col">Date</th>
+        <th scope="col">Remove</th>
       </tr>
     </thead>
     <tbody>
@@ -36,6 +37,13 @@
         <td>{{food.consumed_calories}}</td>
         <td>{{food.product_calories}}</td>
         <td>{{food.created_at}}</td>
+        <td>
+          <form action="/delete_entry" method="POST">
+            <input type="hidden" name="entry_id" value="{{ food.id }}" required />
+            <input type="hidden" name="next" value="/" />
+            <button type="submit" class="btn btn-primary">Remove</button>
+          </form>
+        </td>
       </tr>
       {% endfor %}
     </tbody>
