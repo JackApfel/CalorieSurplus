@@ -29,8 +29,17 @@
       <td>{{food.consumed_calories}}</td>
       <td>{{food.product_calories}}</td>
       <td>{{food.created_at}}</td>
+      <td>
+        <form action="/delete_entry" method="POST">
+          <input type="hidden" name="entry_id" value="{{ food.id }}" required />
+          <input type="hidden" name="next" value="/" />
+          <button type="submit" class="btn btn-primary">Remove</button>
+        </form>
+      </td>
     </tr>
     {% endfor %}
   </tbody>
 </table>
+{% endblock %} {% block scripts %}
+<script src="{{ url_for('static', filename='js/scripts.js') }}"></script>
 {% endblock %}
