@@ -17,7 +17,6 @@
       style="width: {{((daily_calories[0].daily_calories | default(0, true)) / session.calorie_goal) * 100}}%"
     ></div>
   </div>
-  <p>{{(daily_calories[0].daily_calories | default(0, true)) + (1)}}</p>
   <table class="table table-striped">
     <thead>
       <tr>
@@ -26,6 +25,7 @@
         <th scope="col">Consumed Calories</th>
         <th scope="col">kcal/100</th>
         <th scope="col">Date</th>
+        <th scope="col">Remove</th>
       </tr>
     </thead>
     <tbody>
@@ -36,9 +36,19 @@
         <td>{{food.consumed_calories}}</td>
         <td>{{food.product_calories}}</td>
         <td>{{food.created_at}}</td>
+        <td>
+          <form action="/delete_entry" method="POST">
+            <input type="hidden" name="entry_id" value="{{ food.id }}" required />
+            <input type="hidden" name="next" value="/" />
+            <button type="submit" class="btn btn-primary">Remove</button>
+          </form>
+        </td>
       </tr>
       {% endfor %}
     </tbody>
   </table>
   {% endblock %}
 </div>
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/scripts.js') }}"></script>
+{% endblock %}
