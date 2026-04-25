@@ -33,14 +33,14 @@ def index():
         grams = request.form.get("grams")
 
         if not calories or not name or not barcode or not grams:
-            flash("Empty field/s", "danger")
+            flash("Fields cannot be empty!", "danger")
             return redirect("/")
 
         try:
             calories = int(float(calories))
             grams = int(float(grams))
-        except ValueError as e:
-            flash(f"A field is not a number! {e}", "danger")
+        except ValueError:
+            flash("Illegal Input! Must be type number.", "danger")
             return redirect("/")
 
         db.execute(
@@ -53,6 +53,7 @@ def index():
             session["user_id"],
             session["calorie_goal"],
         )
+        flash("Entry Added!", "success")
         return redirect("/")
     else:
         foods = db.execute("SELECT * FROM foods WHERE user_id = ?", session["user_id"])
@@ -278,3 +279,11 @@ def preference():
         return redirect("/preference")
     else:
         return render_template("preference.html")
+
+
+@app.route("/delete_entry", methods=["POST"])
+def delete():
+    db.execute("DELETE FROM foods WHERE id = ?", request.form.get("entry_id"))
+    flash("Entry Deleted", "success")
+    next_page = request.form.get("next", "/")
+    return redirect(next_page)
