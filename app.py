@@ -104,7 +104,7 @@ def login():
             return redirect("/login")
 
         calorie_goal = db.execute(
-            "SELECT calorie_goal WHERE user_id = ?", users[0]["id"]
+            "SELECT calorie_goal FROM preferences WHERE user_id = ?", users[0]["id"]
         )
         session["calorie_goal"] = calorie_goal[0]["calorie_goal"]
         return redirect("/")
@@ -140,6 +140,11 @@ def register():
         session["user_id"] = user_id
 
         db.execute("INSERT INTO preferences (user_id) VALUES(?);", session["user_id"])
+
+        calorie_goal = db.execute(
+            "SELECT calorie_goal FROM preferences WHERE user_id = ?", user_id
+        )
+        session["calorie_goal"] = calorie_goal[0]["calorie_goal"]
 
         flash("Registration successful. Welcome!", "success")
         return redirect("/")
@@ -283,7 +288,11 @@ def preference():
 
 @app.route("/delete_entry", methods=["POST"])
 def delete():
-    db.execute("DELETE FROM foods WHERE id = ?", request.form.get("entry_id"))
+    db.execute(
+        "DELETE FROM foods WHERE id = ? AND user_id = ?",
+        request.form.get("entry_id"),
+        session["user_id"],
+    )
     flash("Entry Deleted", "success")
     next_page = request.form.get("next", "/")
     return redirect(next_page)
