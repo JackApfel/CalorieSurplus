@@ -1,41 +1,124 @@
-/* Assisted by GitHub Copilot while refactoring the base mobile-first layout. */
+/* Assisted by GitHub Copilot while building the Bootstrap theme with the
+ five-color palette #335C67 / #FFF3B0 / #E09F3E / #9E2A2B / #540B0E. */
 
-html,
-body {
-  height: 100%;
+/* ── Light mode ────────────────────────────────────────────────────────
+         Palette roles:
+           #FFF3B0  warm cream  → page background
+           #335C67  dark teal   → body text, primary brand (navbar, btn-primary)
+           #E09F3E  amber gold  → custom accent token (--accent)
+           #9E2A2B  deep red    → links, danger / secondary emphasis
+           #540B0E  dark maroon → hover / text-emphasis on red elements          */
+:root,
+[data-bs-theme='light'] {
+  /* Page surface */
+  --bs-body-bg: #fff3b0;
+  --bs-body-bg-rgb: 255, 243, 176;
+  --bs-body-color: #335c67;
+  --bs-body-color-rgb: 51, 92, 103;
+
+  /* Primary brand = teal (navbar, btn-primary, bg-primary) */
+  --bs-primary: #335c67;
+  --bs-primary-rgb: 51, 92, 103;
+  --bs-primary-bg-subtle: #cfe2e6;
+  --bs-primary-border-subtle: #9ec8d0;
+  --bs-primary-text-emphasis: #1a3a41;
+
+  /* Amber gold as secondary surface accent */
+  --bs-secondary-bg: #f5e898;
+  --bs-secondary-bg-rgb: 245, 232, 152;
+  --bs-tertiary-bg: #ede08a;
+  --bs-tertiary-bg-rgb: 237, 224, 138;
+
+  /* Deep red for danger / accented borders */
+  --bs-danger: #9e2a2b;
+  --bs-danger-rgb: 158, 42, 43;
+  --bs-danger-bg-subtle: #f3d0d0;
+  --bs-danger-border-subtle: #d88080;
+  --bs-danger-text-emphasis: #540b0e;
+
+  --bs-border-color: #d4c870;
+  --bs-border-color-rgb: 212, 200, 112;
+
+  /* Links use deep red for stronger contrast on the cream background */
+  --bs-link-color: #9e2a2b;
+  --bs-link-hover-color: #540b0e;
+
+  /* Custom accent token — use with var(--accent) in other CSS */
+  --accent: #e09f3e;
+  --accent-rgb: 224, 159, 62;
+
+  /*  */
 }
 
-.app-shell {
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
+/* ── Dark mode ─────────────────────────────────────────────────────────
+         Palette roles:
+           #1a2e32  very dark teal  → page background (derived from #335C67)
+           #FFF3B0  warm cream      → body text
+           #335C67  teal            → card/secondary surfaces
+           #E09F3E  amber gold      → links, active nav
+           #9E2A2B  deep red        → danger
+           #540B0E  dark maroon     → deeper danger / text-emphasis             */
+[data-bs-theme='dark'] {
+  --bs-body-bg: #1a2e32;
+  --bs-body-bg-rgb: 26, 46, 50;
+  --bs-body-color: #fff3b0;
+  --bs-body-color-rgb: 255, 243, 176;
+
+  --bs-primary: #335c67;
+  --bs-primary-rgb: 51, 92, 103;
+  --bs-primary-bg-subtle: #0d1e22;
+  --bs-primary-border-subtle: #335c67;
+  --bs-primary-text-emphasis: #a8d4dc;
+
+  --bs-secondary-bg: #243a42;
+  --bs-secondary-bg-rgb: 36, 58, 66;
+  --bs-tertiary-bg: #2c4a52;
+  --bs-tertiary-bg-rgb: 44, 74, 82;
+
+  --bs-danger: #9e2a2b;
+  --bs-danger-rgb: 158, 42, 43;
+  --bs-danger-bg-subtle: #3d0e0e;
+  --bs-danger-border-subtle: #9e2a2b;
+  --bs-danger-text-emphasis: #f0b0b0;
+
+  --bs-border-color: #3a5a64;
+  --bs-border-color-rgb: 58, 90, 100;
+
+  /* Amber gold is highly readable on dark teal surfaces */
+  --bs-link-color: #e09f3e;
+  --bs-link-hover-color: #f0b850;
+
+  --accent: #e09f3e;
+  --accent-rgb: 224, 159, 62;
 }
 
-.app-navbar {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+[data-bs-theme='light'] .btn-primary {
+  --bs-btn-color: #fff3b0;
+  --bs-btn-bg: #335c67;
+  --bs-btn-border-color: #335c67;
+
+  --bs-btn-hover-color: #fff3b0;
+  --bs-btn-hover-bg: #2b4f58;
+  --bs-btn-hover-border-color: #2b4f58;
+
+  --bs-btn-active-color: #fff3b0;
+  --bs-btn-active-bg: #223f46;
+  --bs-btn-active-border-color: #223f46;
+
+  --bs-btn-focus-shadow-rgb: 224, 159, 62;
 }
 
-.app-navbar .nav-link {
-  color: rgba(255, 255, 255, 0.88);
+[data-bs-theme='dark'] .btn-primary {
+  --bs-btn-color: #fff3b0;
+  --bs-btn-bg: #335c67;
+  --bs-btn-border-color: #335c67;
+  --bs-btn-hover-color: #fff3b0;
+  --bs-btn-hover-bg: #3d6d79;
+  --bs-btn-hover-border-color: #3d6d79;
+  --bs-btn-focus-shadow-rgb: 224, 159, 62;
 }
 
-.app-navbar .nav-link:hover,
-.app-navbar .nav-link:focus {
-  color: #ffffff;
-}
-
-main.container {
-  width: 100%;
-}
-
-.app-footer {
-  border-top: 1px solid #dee2e6;
-  background-color: #ffffff;
-}
-
-/* Assisted by GitHub Copilot while making catalog card images uniform. */
-.card-img-top {
-  object-fit: contain;
-  height: 200px;
-  background-color: #f8f9fa;
+[data-bs-theme='light'] .form-basic {
+  color: var(--bs-body-bg);
+  box-shadow: var(--bs-body-bg);
 }

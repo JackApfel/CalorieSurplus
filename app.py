@@ -296,3 +296,8 @@ def delete():
     flash("Entry Deleted", "success")
     next_page = request.form.get("next", "/")
     return redirect(next_page)
+
+
+@app.route("/test")
+def test():
+    return render_template("test.html")

@@ -79,7 +79,7 @@ TODO
 **Limitation:**
 
 - The Open Food Facts (OFF) API does not cover all products or self cooked meals.
-  
+
 - The Open Food Facts API does often return error 503
 
 **Future Work:**
@@ -92,9 +92,7 @@ TODO
 
 This project follows CS50's Academic Honesty guidelines.
 
-I did first use AI when starting this project, but soon enough i did realize that it was more of a hindrance then it was helping.
-
-I minimized my AI usage to mostly just be help with Syntax i had forgotten.
+I minimized my AI usage as far as i could, but used it when i had forgotten Syntax or to refactor the layout.html
 
 AI assisted code is marked via comment.
 

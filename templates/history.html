@@ -1,11 +1,37 @@
 {% extends "layout.html" %} {% block title %}Home{% endblock %} {% block content %}
-<form action="/history" method="POST">
-  {% if date %}
-  <input name="date" type="date" value="{{date}}" required />
-  {%else%}
-  <input name="date" type="date" required />
-  {%endif%}
-  <button type="submit">submit</button>
+
+<form action="/history" method="post" class="">
+  <label for="dateSearchInput" class="form-label">Select Date</label>
+  <div class="containerr-sm text-center">
+    <div class="row row-cols-sm-2">
+      <div class="col-sm mb-3">
+        {% if date %}
+        <input
+          id="dateSearchInput"
+          name="date"
+          type="date"
+          class="form-control mb-sm-3 pb-3 pt-3 text-center"
+          placeholder="Freeway Iso Sport"
+          value="{{date}}"
+          required
+        />
+        {%else%}
+        <input
+          id="dateSearchInput"
+          type="date"
+          class="form-control mb-sm-3 pb-3 pt-3 text-center"
+          placeholder="Freeway Iso Sport"
+          required
+        />
+        {%endif%}
+      </div>
+      <div class="col-sm">
+        <button type="submit" class="btn btn-primary form-control pb-3 pt-3 text-center mb-5">
+          Search Date
+        </button>
+      </div>
+    </div>
+  </div>
 </form>
 
 <p class="h3">
