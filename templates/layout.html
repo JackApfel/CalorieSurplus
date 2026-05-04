@@ -1,24 +1,37 @@
+<!-- layout.html refactored with assistants from Copilot -->
+
 <!doctype html>
-<html lang="en">
+<!-- data-bs-theme on <html> sets the global Bootstrap color mode for the whole page -->
+<html lang="en" data-bs-theme="light">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="description" content="Calorie Tracker" />
 
+    <!-- Bootstrap CSS (component styles + utility classes) -->
     <link
       href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
       rel="stylesheet"
       integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB"
       crossorigin="anonymous"
     />
+    <!-- Project-specific CSS overrides come AFTER Bootstrap so custom variables win -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}" />
+
     <title>Calorie Tracker</title>
   </head>
-  <body class="d-flex flex-column min-vh-100">
-    <header>
-      <!-- From the Bootstrap Docs-->
-      <nav class="navbar navbar-expand-lg shadow-sm" data-bs-theme="light">
-        <div class="container-fluid">
-          <a class="navbar-brand" href="/">Calorie Tracker</a>
+
+  <!-- d-flex flex-column min-vh-100: stack header / main / footer vertically -->
+  <body class="d-flex flex-column min-vh-100 bg-body text-body">
+    <header class="border-bottom border-primary-subtle">
+      <!-- Navbar: bg-primary uses --bs-primary (teal); data-bs-theme="dark" keeps
+           the toggler icon and nav-link contrast correct on the dark surface.
+           Assisted by GitHub Copilot while adapting the pilot_layout navbar pattern. -->
+      <nav class="navbar navbar-expand-lg bg-primary shadow-sm" data-bs-theme="dark">
+        <div class="container">
+          <a class="navbar-brand fw-semibold" href="/">Calorie Tracker</a>
+
+          <!-- Hamburger toggler for mobile screens (Bootstrap Docs) -->
           <button
             class="navbar-toggler"
             type="button"
@@ -30,7 +43,9 @@
           >
             <span class="navbar-toggler-icon"></span>
           </button>
+
           <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <!-- me-auto pushes the theme button to the right -->
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
               <li class="nav-item">
                 <a class="nav-link active" aria-current="page" href="/">Home</a>
@@ -40,10 +55,10 @@
               <li class="nav-item">
                 <a class="nav-link" href="/catalog">Catalog</a>
               </li>
-              <li>
+              <li class="nav-item">
                 <a class="nav-link" href="/history">History</a>
               </li>
-              <li>
+              <li class="nav-item">
                 <a class="nav-link" href="/preference">Preferences</a>
               </li>
               <li class="nav-item">
@@ -58,42 +73,80 @@
               </li>
               {% endif %}
             </ul>
+
+            <!-- Dark/Light toggle button -->
+            <button id="themeToggle" type="button" class="btn btn-outline-light btn-sm">
+              Dark mode
+            </button>
           </div>
         </div>
       </nav>
-      <!-- First made by Copilot, but then i re did it with the help of the Flask and Bootstrap Documentation  -->
+
+      <!-- Flash messages — adapted from Flask docs + Bootstrap alert component.
+           Assisted by GitHub Copilot while wiring Flask flash categories to
+           Bootstrap alert variants. -->
       {% with messages = get_flashed_messages(with_categories=true) %} {% if messages %}
-      <div>
-        {% for category, message in messages %}
-        <div class="alert alert-{{category}} alert-dismissible fade show" role="alert">
+      <div class="container py-3">
+        {% for category, message in messages %} {% set bs_category = "info" if category == "message"
+        else category %}
+        <div class="alert alert-{{bs_category}} alert-dismissible fade show mb-2" role="alert">
+          <div class="fw-medium">{{ message }}</div>
           <button
             type="button"
             class="btn-close"
             data-bs-dismiss="alert"
             aria-label="Close"
           ></button>
-          <li>{{ message }}</li>
         </div>
         {% endfor %}
       </div>
       {% endif %} {% endwith %}
     </header>
 
-    <main class="flex-grow-1">
-      <!-- Content goes here -->
-      {% block content %}{% endblock %}
+    <!-- flex-grow-1 consumes leftover vertical space so footer stays at bottom -->
+    <main class="flex-grow-1 py-4">
+      <div class="container">{% block content %}{% endblock %}</div>
     </main>
 
-    <footer class="mt-auto">
-      <small>&copy; 2026 Calorie Tracker</small>
+    <footer class="mt-auto py-3 border-top bg-body text-body">
+      <div class="container small text-body-secondary">&copy; 2026 Calorie Tracker</div>
     </footer>
 
-    <!-- Scripts -->
     {% block scripts %} {% endblock %}
+
     <script
       src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
       integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI"
       crossorigin="anonymous"
     ></script>
+
+    <!-- Theme-persistence script.
+         Assisted by GitHub Copilot while writing the localStorage theme switch. -->
+    <script>
+      (() => {
+        const storageKey = 'theme';
+        const root = document.documentElement;
+        const button = document.getElementById('themeToggle');
+
+        // Apply saved preference before first paint to avoid flash
+        const saved = localStorage.getItem(storageKey);
+        if (saved === 'light' || saved === 'dark') {
+          root.setAttribute('data-bs-theme', saved);
+        }
+
+        const syncLabel = () => {
+          button.textContent =
+            root.getAttribute('data-bs-theme') === 'dark' ? 'Light mode' : 'Dark mode';
+        };
+
+        syncLabel();
+        button.addEventListener('click', () => {
+          const next = root.getAttribute('data-bs-theme') === 'dark' ? 'light' : 'dark';
+          root.setAttribute('data-bs-theme', next);
+          localStorage.setItem(storageKey, next);
+          syncLabel();
+        });
+      })();
+    </script>
   </body>
 </html>

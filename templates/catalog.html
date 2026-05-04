@@ -2,69 +2,95 @@
 <div class="container mt-5 text-center"></div>
 <!--Build with the CHEATSHEET as reference-->
 <div class="container mt-5 text-center">
-  <h1>Search Product</h1>
+  <h1>Catalog</h1>
 </div>
 
-<div class="container mt-5 text-center">
-  <form action="/catalog" method="POST" class="mb-5">
-    <div class="mb-1">
-      <label for="search">search item</label>
-      <input type="text" class="form-control" id="search" name="search" />
+<form action="/catalog" method="post" class="mt-5">
+  <label for="catalogSearchInput" class="form-label">Enter Product Name</label>
+  <div class="containerr-sm text-center">
+    <div class="row row-cols-sm-2">
+      <div class="col-sm mb-3">
+        <input
+          id="catalogSearchInput"
+          type="text"
+          class="form-control mb-sm-3 pb-3 pt-3 text-center"
+          placeholder="Freeway Iso Sport"
+        />
+      </div>
+      <div class="col-sm">
+        <button type="submit" class="btn btn-primary form-control pb-3 pt-3 text-center mb-5">
+          Search Product
+        </button>
+      </div>
     </div>
-    <button type="submit" class="btn btn-primary">Search</button>
-  </form>
-</div>
+  </div>
+</form>
+
 <div class="container">
-  <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-3">
-    {% if item %} {% for data in item.products %}
-    <form action="/" method="POST">
-      <div class="col mb-3 d-flex flex-column justify-content-end">
-        <div class="card rounded">
+  <!-- AI-assisted: bottom-align cards per grid row via Bootstrap flex alignment -->
+  <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-3 align-items-end">
+    {% if item %} {% for product in item.products %}
+    <!-- AI-assisted: Full-height chain keeps the form controls aligned near the same baseline -->
+    <div class="col mb-3 d-flex align-items-end h-100">
+      <form action="/" method="POST" class="w-100 d-flex align-items-end h-100">
+        <div class="card rounded w-100 h-100">
           <img
-            src="{{data.image_front_small_url}}"
-            alt="{{data.product_name | default('Unknown')}}"
+            src="{{product.image_front_small_url}}"
+            alt="{{product.product_name | default('Unknown')}}"
             style="max-width: 50%; height: auto"
             class="img-thumbnail rounded"
           />
-          <div class="card-body d-flex flex-column justify-content-end">
-            <p class="h5 card-title">{{data.product_name | default("Unknown")}}</p>
+          <div class="card-body d-flex flex-column justify-content-end h-100">
+            <p class="h5 card-title">{{product.product_name | default("Unknown")}}</p>
             <ul>
-              <li><p class="card-text">Brand: {{data.brands | default("Unknown")}}</p></li>
+              <li><p class="card-text">Brand: {{product.brands | default("Unknown")}}</p></li>
               <li>
                 <p class="card-text">
                   Calories per 100g:
                   <strong
-                    >{{ (data.nutriments or {})['energy-kcal_100g'] | default('N/A') }}</strong
+                    >{{ (product.nutriments or {})['energy-kcal_100g'] | default('N/A') }}</strong
                   >
+                </p>
+              </li>
+              <li>
+                <p class="card-text">
+                  Quantity:
+                  <strong>{{ product.quantity | default('N/A') }}</strong>
                 </p>
               </li>
             </ul>
             <input
               type="hidden"
               name="name"
-              value="{{ data.product_name | default('Unknown') }}"
+              value="{{ product.product_name | default('Unknown') }}"
               required
             />
             <input
               type="hidden"
               name="product_calories"
-              value="{{ (data.nutriments or {})['energy-kcal_100g'] | default('N/A') }}"
+              value="{{ (product.nutriments or {})['energy-kcal_100g'] | default('N/A') }}"
               required
             />
             <input
               type="hidden"
               name="code"
-              value="{{ data.code | default('Unknown') }}"
+              value="{{ product.code | default('Unknown') }}"
               required
             />
 
-            <input type="number" name="grams" placeholder="consumed grams" required />
+            <input
+              type="number"
+              name="grams"
+              placeholder="consumed grams"
+              class="form-control mb-2"
+              required
+            />
 
             <button type="submit" class="btn btn-primary">Add</button>
           </div>
         </div>
-      </div>
-    </form>
+      </form>
+    </div>
     {% endfor %} {% endif %}
   </div>
 </div>

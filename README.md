@@ -48,14 +48,14 @@ This project idea came to me because i am myself very underweight, and to help m
 
 This Project uses a very simple SQLite database
 
-- users (stores user specific information)
+- users (Stores user specific information)
   - **id** (INTEGER PRIMARY KEY, unique users id)
   - **email** (TEXT, the email of the user)
   - **hash** (TEXT, password hash of the users password)
   - **created_at** (TEXT, entry creation date)
 
 - foods (Stores product specific information)
-  - **name** (TEXT: name of the product)
+  - **name** (TEXT, name of the product)
   - **product_calories** (INTEGER, products kcal per 100g)
   - **consumed_calories** (INTEGER, calories consumed by the user)
   - **user_id** (INTEGER, the user_id of the corresponding user)
@@ -64,29 +64,41 @@ This Project uses a very simple SQLite database
   - **created_at** (TEXT, entry creation date)
   - **user_id** (FOREIGN KEY, references the `users` tables `id` field)
 
+- preferences (Stores preferences set by the user)
+  - **id** (INTEGER PRIMARY KEY, unique id of the preference set)
+  - **user_id** (INTEGER UNIQUE, id of the user this preferences belong to)
+  - **calorie_goal** (INTEGER DEFAULT 2000, daily calorie goal for the user)
+  - **(reference) user_id** (TODO)
+
 ## Design Decisions
 
 TODO
 
 ## Known Limitations / Future Work
 
-**Limitation:** The Open Food Facts (OFF) API does not cover all products or self cooked meals.
+**Limitation:**
 
-**Future Work:** The current design of the application is not sightly and is plain looking, a more appealing design is planned.
+- The Open Food Facts (OFF) API does not cover all products or self cooked meals.
+
+- The Open Food Facts API does often return error 503
+
+**Future Work:**
+
+- The current design of the application is not sightly and is plain looking, a more appealing design is planned.
+
+- Addressing the frequent 503 errors
 
 ## Academic Honesty & AI Usage
 
 This project follows CS50's Academic Honesty guidelines.
 
-I did first use AI when starting this project, but soon enough i did realize that it was more of a hindrance then it was helping.
-
-I minimized my AI usage to mostly just be help with Syntax i had forgotten.
+I minimized my AI usage as far as i could, but used it when i had forgotten Syntax or to refactor the layout.html
 
 AI assisted code is marked via comment.
 
 when AI was used it was this this used with this prompt.md, the prompt file was created by Github Copilot.
 See: `.github/prompts/honesty.prompt.md`.
 
-Also: when working form laptop, every time i save a file all longer lines of code get automatically broken up and indented, i dunno why.
-
 ## Video Demo
+
+**TODO**
