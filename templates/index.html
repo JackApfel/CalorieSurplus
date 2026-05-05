@@ -1,8 +1,8 @@
 {% extends "layout.html" %} {% block title %}Home{% endblock %} {% block content %}
 <div class="container mt-5 text-center">
   <h1>Calorie Tracker</h1>
-  <h2>Calories Today: {{daily_calories[0].daily_calories | default(0, true)}}</h2>
-  <h2>Calories Last 7 Days: {{weekly_calories[0].weekly_calories | default(0, true)}}</h2>
+  <h2>Calories Today: {{(daily_calories[0].daily_calories | default(0, true) | round)}}</h2>
+  <h2>Calories Last 7 Days: {{(weekly_calories[0].weekly_calories | default(0, true) | round)}}</h2>
   <h3>Calorie Goal: {{session.calorie_goal}}</h3>
   <div
     class="progress"
@@ -14,10 +14,10 @@
   >
     <div
       class="progress-bar progress-bar-striped progress-bar-animated"
-      style="width: {{((daily_calories[0].daily_calories | default(0, true)) / session.calorie_goal) * 100}}%"
+      style="width: {% if session.calorie_goal < 1 %} 0 {% else %} {{((daily_calories[0].daily_calories | default(0, true)) / session.calorie_goal) * 100}} {% endif %}%"
     ></div>
   </div>
-  <table class="table table-striped">
+  <table class="table table-striped mt-3">
     <thead>
       <tr>
         <th scope="col">Name</th>
@@ -47,8 +47,7 @@
       {% endfor %}
     </tbody>
   </table>
-  {% endblock %}
 </div>
-{% block scripts %}
+{% endblock %} {% block scripts %}
 <script src="{{ url_for('static', filename='js/scripts.js') }}"></script>
 {% endblock %}

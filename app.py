@@ -37,17 +37,21 @@ def index():
             return redirect("/")
 
         try:
-            calories = int(float(calories))
-            grams = int(float(grams))
+            calories = int(round(float(calories)))
+            grams = int(round(float(grams)))
         except ValueError:
-            flash("Illegal Input! Must be type number.", "danger")
+            flash("Invalid input: calories/grams missing or not numeric", "danger")
             return redirect("/")
+
+        if grams < 1 or calories < 1:
+            flash("Values can not be Zero or less", "danger")
+            return redirect("/catalog")
 
         db.execute(
             "INSERT INTO foods (name, product_calories, consumed_calories, barcode, grams, user_id, calorie_goal) VALUES(?,?,?,?,?,?,?)",
             name,
             calories,
-            (calories / 100) * grams,
+            round((calories / 100) * grams),
             barcode,
             grams,
             session["user_id"],
@@ -103,10 +107,20 @@ def login():
             flash("Invalid email or password.", "danger")
             return redirect("/login")
 
-        calorie_goal = db.execute(
+        calorie_goal_row = db.execute(
             "SELECT calorie_goal FROM preferences WHERE user_id = ?", users[0]["id"]
         )
-        session["calorie_goal"] = calorie_goal[0]["calorie_goal"]
+
+        if not calorie_goal_row:
+            db.execute(
+                "INSERT INTO preferences (user_id, calorie_goal) VALUES (?, ?)",
+                users[0]["id"],
+                2000,
+            )
+            calorie_goal_row = [{"calorie_goal": 2000}]
+
+        session["calorie_goal"] = calorie_goal_row[0]["calorie_goal"]
+
         return redirect("/")
     else:
         return render_template("login.html")
@@ -120,7 +134,7 @@ def register():
         confirm_password = request.form.get("confirm_password")
 
         if not email or not password or not confirm_password:
-            flash("Email, password, and confirmation are required.", "waring")
+            flash("Email, password, and confirmation are required.", "warning")
             return redirect("/register")
 
         if password != confirm_password:
@@ -195,9 +209,9 @@ def catalog():
                 "danger",
             )
             return redirect("/catalog")
-        except requests.exceptions.HTTPError as e:
+        except requests.exceptions.HTTPError:
             flash(
-                f"Food database returned an error (HTTP {e.response.status_code}). Please try again later.",
+                "Food database returned an error. Please try again later.",
                 "danger",
             )
             return redirect("/catalog")
@@ -207,7 +221,6 @@ def catalog():
             )
             return redirect("/catalog")
 
-        print(f"Data: {data}")
         return render_template("catalog.html", item=data, search_term=search_term)
     else:
         return render_template("catalog.html")
@@ -227,24 +240,16 @@ def history():
             )
 
             total_calories = db.execute(
-                "SELECT sum(consumed_calories) as total_calories FROM foods WHERE user_id = ? AND date(created_at) = ?",
+                "SELECT COALESCE(SUM(consumed_calories), 0) as total_calories FROM foods WHERE user_id = ? AND date(created_at) = ?",
                 session["user_id"],
                 date,
             )
-
-            if not total_calories:
-                return render_template(
-                    "history.html",
-                    foods=products,
-                    date=date,
-                    total_calories=[{"total_calories": 0}],
-                )
-
-        except Exception as e:
+        except Exception:
             flash(
-                f"Database encountered an error: {e}",
+                "Database encountered an error.",
                 "danger",
             )
+            return redirect("/history")
 
         return render_template(
             "history.html", foods=products, date=date, total_calories=total_calories
@@ -263,11 +268,17 @@ def preference():
             flash("Error: Calorie goal is null", "danger")
             return redirect("/preference")
         try:
-            daily_calorie_goal = int(daily_calorie_goal_form)
+            daily_calorie_goal = int(round(float(daily_calorie_goal_form)))
         except ValueError:
             flash(
                 "Input was not a number!",
                 "danger",
+            )
+            return redirect("/preference")
+        if daily_calorie_goal < 1:
+            flash(
+                "Calorie goal can not be Zero or less!",
+                "warning",
             )
             return redirect("/preference")
 
@@ -279,25 +290,33 @@ def preference():
         )
         session["calorie_goal"] = daily_calorie_goal
 
-        print(session["calorie_goal"])
-
         return redirect("/preference")
     else:
         return render_template("preference.html")
 
 
 @app.route("/delete_entry", methods=["POST"])
+@helpers.login_required
 def delete():
     db.execute(
         "DELETE FROM foods WHERE id = ? AND user_id = ?",
         request.form.get("entry_id"),
         session["user_id"],
     )
+
+    allowed_redirects = {
+        "/",
+        "/history",
+        "/catalog",
+        "/preference",
+        "/login",
+        "/logout",
+        "/register",
+    }
+
+    next_page = request.form.get("next")
+    if next_page not in allowed_redirects:
+        next_page = "/"
+
     flash("Entry Deleted", "success")
-    next_page = request.form.get("next", "/")
     return redirect(next_page)
-
-
-@app.route("/test")
-def test():
-    return render_template("test.html")
