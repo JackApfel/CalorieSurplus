@@ -15,7 +15,8 @@ This project idea came to me because i am myself very underweight, and to help m
 
 - Simple UI/UX
 - Vast Database for food items powered by Open Food Facts
-- Overview over past meals and daily calorie tracking
+- Overview over past meals
+- daily calorie tracking
 
 ## Tech Stack
 
@@ -27,9 +28,9 @@ This project idea came to me because i am myself very underweight, and to help m
 
 - Clone this repository `git clone https://github.com/JackApfel/Kalorien-Z-hler.git`
 - Install dependencies `pip install -r requirements.txt`
-- Run `python init_db.py`
-- Create the `.env`
-- Then start with `run flask`
+- Create the database with `python init_db.py` with the `-c` flag
+- Create the `.env` with a `SECRET_KEY` key and `FLASK_DEBUG` boolean.
+- Then start with `flask run`
 
 ## Project Structure
 
@@ -72,7 +73,38 @@ This Project uses a very simple SQLite database
 
 ## Design Decisions
 
-TODO
+**Database**
+
+I decided to use SQLite for its simplicity and portability, the schema is kept simple with users, foods and preferences for ease of use.
+
+The foods table stores a snapshot of the current calorie goal of the row when it's created.
+This is to preserve the historical context for future use.
+
+**Authentication & Security**
+
+I went for werkzeug.security for password hashing as learned in week 9, it is simple to use and secure wich made it perfect for this project.
+
+Variables like the SECRET_KEY are stored and loaded from .env, it is more secure than storing it inside the app itself and is easy to configure.
+
+All database queries use parameterized statements thanks to cs50.SQL to avoid SQL injection to further improve security.
+
+**External API**
+
+The product lookup is provided by Open Food Facts, as i found it to be an excellent tool that fit this project very well.
+
+The requests to the Open Food Facts API include a descriptive User-Agent, only needed fields to reduce payload and timeouts plus robust error handling to provide feedback on failures.
+
+**Input Validation & UX**
+
+Numeric inputs like calories, grams and goal are validated and cast to integers for a streamlined handling and better visualization.
+
+The app follow POST-Redirect_GET to ensure a smooth user experience and runtime and flash message for clean user feedback.
+
+**Simplicity & Portability**
+
+Flask and SQLite minimize dependencies and setup complexity, making the project easier to develop and test. The lightweight stack is portable and there is no external database server needed.
+
+I kept the UI as simple as i could because i'm not a designer and keeping it simple improves readability and useability across devices.
 
 ## Known Limitations / Future Work
 
@@ -80,11 +112,15 @@ TODO
 
 - The Open Food Facts (OFF) API does not cover all products or self cooked meals.
 
-- The Open Food Facts API does often return error 503
+- The app is not currently Caching OFF results, which would help reduce API requests for frequently searched items
+
+- The Open Food Facts API does have a strict API request limit.
 
 **Future Work:**
 
 - The current design of the application is not sightly and is plain looking, a more appealing design is planned.
+
+- tiding up the database schema.
 
 - Addressing the frequent 503 errors
 
@@ -92,7 +128,9 @@ TODO
 
 This project follows CS50's Academic Honesty guidelines.
 
-I minimized my AI usage as far as i could, but used it when i had forgotten Syntax or to refactor the layout.html
+I minimized my AI usage as far as i could, but used it when i had forgotten Syntax, to refactor the layout.html and to help audit my code.
+
+I also used AI to help me better formalize my sentences and documentation.
 
 AI assisted code is marked via comment.
 
@@ -101,4 +139,4 @@ See: `.github/prompts/honesty.prompt.md`.
 
 ## Video Demo
 
-**TODO**
+TODO
