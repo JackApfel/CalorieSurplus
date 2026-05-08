@@ -52,12 +52,6 @@ def drop():
     create()
 
 
-def update():
-    db.execute(
-        "ALTER TABLE preferences RENAME COLUMN calorie_goal TO daily_calorie_goal"
-    )
-
-
 # match syntax was found on StackOverflow when searching for a switch like statement in Python
 match sys.argv[1]:
     case "-h" | "--help":

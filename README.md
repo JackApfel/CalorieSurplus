@@ -4,137 +4,186 @@
 
 ## Overview
 
-This is a web-application based on Python and Flask, made for making weight gain easier.
-It is a calorie counting app with a vast database of different foods powered by Open Food Facts
+This project is a web application built with Flask and SQLite.
 
-It has a Simple UI/UX and is usable across devices.
+The app is for people who want to track their calorie intake and set a daily calorie goal.
 
-This project idea came to me because i am myself very underweight, and to help me improve my health; i developed this app.
+Product search is powered by Open Food Facts.
+
+It provides a basic overview of daily progress.
+
+It was built as a learning project and as my final project for Harvard's CS50x course.
 
 ## Features
 
-- Simple UI/UX
-- Vast Database for food items powered by Open Food Facts
-- Overview over past meals
-- daily calorie tracking
+- Register to create an account and log in at any time.
+- Search products by name.
+- Enter the consumed grams for a selected product.
+- Calories are automatically calculated and summarized.
+- Set a personal calorie goal on the preferences page.
+- Check your meal history.
 
 ## Tech Stack
 
-- Database: SQLite3
-- Backend: Python, Flask
-- Frontend: HTML, CSS, JavaScript
+This project uses:
+
+- Flask (backend framework)
+
+- SQLite (database)
+
+- HTML/CSS/JavaScript (frontend)
+
+- Open Food Facts API (product data)
+
+I used Flask because it is lightweight and beginner-friendly.
+
+SQLite is a good fit for this project because it is simple and portable.
+
+The frontend is built with HTML, CSS, and JavaScript to keep pages simple and responsive.
+
+External data is fetched via HTTP requests to Open Food Facts.
 
 ## Installation & Running
 
+**Requirements:**
+
+- Python 3.14.4
+- pip
+
+**Installation:**
+
 - Clone this repository `git clone https://github.com/JackApfel/Kalorien-Z-hler.git`
+- Create a virtual environment `python3.14 -m venv .venv`
+- Activate the virtual environment:
+  - Linux/macOS: `source .venv/bin/activate`
+  - Windows (PowerShell): `.venv\Scripts\Activate.ps1`
+  - Windows (CMD): `.venv\Scripts\activate.bat`
 - Install dependencies `pip install -r requirements.txt`
-- Create the database with `python init_db.py` with the `-c` flag
-- Create the `.env` with a `SECRET_KEY` key and `FLASK_DEBUG` boolean.
-- Then start with `flask run`
+- Create the database `python init_db.py -c`
+- Create `.env` from `.env.example` and set `SECRET_KEY` and `FLASK_DEBUG`
+- Start the app with `flask run`
 
 ## Project Structure
 
-- `app.py` - Starts the Application
-- `helpers.py` - Utility functions for app.py
-- `init_db.py` - Initialize database
-- `templates/` - HTML templates for Flask/Jinja
-  - `layout.html` - Base layout for Jinja and all HTML files
-  - `index.html`, `login.html`, ...
-- `static/` - Static files like images and css
-  - `css/` - [Styles?]
+- `app.py` - Contains routes and core app logic
+- `helpers.py` - Contains utility functions and decorators
+- `init_db.py` - Creates and resets the database schema
 - `requirements.txt` - Python dependencies
 - `.env` - Stores environment variables
+- `templates/` - Contains Jinja HTML pages
+  - `layout.html` - Base layout for Jinja and all HTML files
+  - `index.html`, `login.html`, ...
+- `static/` - Contains CSS and JavaScript assets
+  - `css/`
+    - `layout.css`
+  - `js/`
+    - `scripts.js`
 
 ## Data Structure
 
-This Project uses a very simple SQLite database
+This project uses a small SQLite database with three main tables: users, foods, and preferences.
+The schema is designed for simplicity and readability because this is a learning project.
+Each user can log many food entries, and each user has one preference record with a personal calorie goal.
 
-- users (Stores user specific information)
-  - **id** (INTEGER PRIMARY KEY, unique users id)
-  - **email** (TEXT, the email of the user)
-  - **hash** (TEXT, password hash of the users password)
-  - **created_at** (TEXT, entry creation date)
+### users
 
-- foods (Stores product specific information)
-  - **name** (TEXT, name of the product)
-  - **product_calories** (INTEGER, products kcal per 100g)
-  - **consumed_calories** (INTEGER, calories consumed by the user)
-  - **user_id** (INTEGER, the user_id of the corresponding user)
-  - **barcode** (INTEGER, the barcode of product)
-  - **grams** (INTEGER, the number of grams consumed from the user)
-  - **created_at** (TEXT, entry creation date)
-  - **user_id** (FOREIGN KEY, references the `users` tables `id` field)
+Purpose: Stores account and authentication data.
 
-- preferences (Stores preferences set by the user)
-  - **id** (INTEGER PRIMARY KEY, unique id of the preference set)
-  - **user_id** (INTEGER UNIQUE, id of the user this preferences belong to)
-  - **calorie_goal** (INTEGER DEFAULT 2000, daily calorie goal for the user)
-  - **(reference) user_id** (TODO)
+- id (INTEGER PRIMARY KEY AUTOINCREMENT): Unique user id
+- email (TEXT UNIQUE NOT NULL): User email address
+- hash (TEXT NOT NULL): Password hash
+- created_at (TEXT DEFAULT CURRENT_TIMESTAMP): Account creation time
+
+### foods
+
+Purpose: Stores each food entry a user logs.
+
+- id (INTEGER PRIMARY KEY AUTOINCREMENT): Unique food entry id
+- name (TEXT NOT NULL): Product name
+- product_calories (INTEGER NOT NULL): Calories per 100g
+- consumed_calories (INTEGER NOT NULL): Calculated calories for consumed grams
+- user_id (INTEGER NOT NULL): Owner of this food entry
+- barcode (INTEGER NOT NULL): Product barcode
+- grams (INTEGER NOT NULL): Consumed amount in grams
+- created_at (TEXT DEFAULT CURRENT_TIMESTAMP): Entry creation time
+- calorie_goal (INTEGER NOT NULL): Snapshot of user calorie goal at entry time
+- Foreign Key: user_id references users.id
+
+### preferences
+
+Purpose: Stores user-specific app preferences.
+
+- id (INTEGER PRIMARY KEY AUTOINCREMENT): Unique preference id
+- user_id (INTEGER NOT NULL UNIQUE): User id linked to this preference row
+- calorie_goal (INTEGER NOT NULL DEFAULT 2000): Daily calorie target
+- Foreign Key: user_id references users.id
+
+### Relationships
+
+- One user can have many food entries (1:N)
+- One user has one preferences row (1:1)
 
 ## Design Decisions
 
-**Database**
+### Database
 
-I decided to use SQLite for its simplicity and portability, the schema is kept simple with users, foods and preferences for ease of use.
+I decided to use SQLite for its simplicity and portability. The schema is intentionally compact, with users, foods, and preferences, to keep development and debugging manageable.
 
-The foods table stores a snapshot of the current calorie goal of the row when it's created.
-This is to preserve the historical context for future use.
+The foods table stores a snapshot of the current calorie goal when each row is created.
+This preserves historical context for future features and analysis.
 
-**Authentication & Security**
+### Authentication & Security
 
-I went for werkzeug.security for password hashing as learned in week 9, it is simple to use and secure wich made it perfect for this project.
+I used `werkzeug.security` for password hashing, as learned in Week 9. It is easy to use and secure, which made it a good choice for this project.
 
-Variables like the SECRET_KEY are stored and loaded from .env, it is more secure than storing it inside the app itself and is easy to configure.
+Variables like `SECRET_KEY` are stored and loaded from `.env`. This is safer than hardcoding secrets in the application and is easier to configure.
 
-All database queries use parameterized statements thanks to cs50.SQL to avoid SQL injection to further improve security.
+All database queries use parameterized statements via `cs50.SQL` to reduce SQL injection risk.
 
-**External API**
+### External API
 
-The product lookup is provided by Open Food Facts, as i found it to be an excellent tool that fit this project very well.
+Product lookup is provided by Open Food Facts, which fits this project very well.
 
-The requests to the Open Food Facts API include a descriptive User-Agent, only needed fields to reduce payload and timeouts plus robust error handling to provide feedback on failures.
+Requests to the Open Food Facts API include a descriptive `User-Agent`, only required fields to reduce payload size, and robust timeout/error handling for better user feedback.
 
-**Input Validation & UX**
+### Input Validation & UX
 
-Numeric inputs like calories, grams and goal are validated and cast to integers for a streamlined handling and better visualization.
+Numeric inputs such as calories, grams, and goals are validated and cast to integers for more reliable handling and cleaner display.
 
-The app follow POST-Redirect_GET to ensure a smooth user experience and runtime and flash message for clean user feedback.
+The app follows the POST-Redirect-GET pattern to improve user flow and uses flash messages for clear feedback.
 
-**Simplicity & Portability**
+### Simplicity & Portability
 
-Flask and SQLite minimize dependencies and setup complexity, making the project easier to develop and test. The lightweight stack is portable and there is no external database server needed.
+Flask and SQLite minimize dependency and setup complexity, making the project easier to develop and test.
+The lightweight stack is portable, and there is no external database server required.
 
-I kept the UI as simple as i could because i'm not a designer and keeping it simple improves readability and useability across devices.
+I kept the UI as simple as possible because I am not a designer, and a simpler layout improves readability and usability across devices.
 
 ## Known Limitations / Future Work
 
-**Limitation:**
+**Limitations:**
 
-- The Open Food Facts (OFF) API does not cover all products or self cooked meals.
-
-- The app is not currently Caching OFF results, which would help reduce API requests for frequently searched items
-
-- The Open Food Facts API does have a strict API request limit.
+- The Open Food Facts (OFF) API does not cover all products or home-cooked meals.
+- The app does not currently cache OFF results, which would help reduce API requests for frequently searched items.
+- The Open Food Facts API has strict request limits.
 
 **Future Work:**
 
-- The current design of the application is not sightly and is plain looking, a more appealing design is planned.
-
-- tiding up the database schema.
-
-- Addressing the frequent 503 errors
+- Improve the visual design to make the interface more polished and appealing.
+- Tidy up the database schema.
+- Address frequent 503 errors.
 
 ## Academic Honesty & AI Usage
 
 This project follows CS50's Academic Honesty guidelines.
 
-I minimized my AI usage as far as i could, but used it when i had forgotten Syntax, to refactor the layout.html and to help audit my code.
+I minimized AI usage as much as possible, but used it when I forgot syntax, to refactor `layout.html`, and to help audit parts of my code.
 
-I also used AI to help me better formalize my sentences and documentation.
+I also used AI to help formalize parts of my writing and documentation.
 
-AI assisted code is marked via comment.
+AI-assisted code is marked via comments.
 
-when AI was used it was this this used with this prompt.md, the prompt file was created by Github Copilot.
+When AI was used, it followed the guidance in the project prompt created with GitHub Copilot.
 See: `.github/prompts/honesty.prompt.md`.
 
 ## Video Demo

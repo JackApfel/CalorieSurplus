@@ -162,3 +162,17 @@
 
   --bs-btn-focus-shadow-rgb: 224, 159, 62;
 }
+/* Progress bar */
+.progress-bar {
+  background-color: var(--accent); /* #E09F3E */
+}
+
+[data-bs-theme='light'] .progress-bar {
+  background-color: #e09f3e;
+  box-shadow: 0 0 6px rgba(224, 159, 62, 0.4);
+}
+
+[data-bs-theme='dark'] .progress-bar {
+  background-color: #e09f3e;
+  box-shadow: 0 0 8px rgba(224, 159, 62, 0.6);
+}

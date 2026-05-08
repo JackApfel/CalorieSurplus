@@ -57,7 +57,7 @@
               <li>
                 <p class="card-text">
                   Quantity:
-                  <strong>{{ product.quantity | default('N/A') }}</strong>
+                  <strong>{{ product.product_quantity | default('N/A') }}{{ product.product_quantity_unit | default('') }}</strong>
                 </p>
               </li>
             </ul>
@@ -79,7 +79,18 @@
               value="{{ product.code | default('Unknown') }}"
               required
             />
-
+             <input
+              type="hidden"
+              name="quantity"
+              value="{{ product.product_quantity | default('N/A') }}"
+              required
+            />
+             <input
+              type="hidden"
+              name="unit"
+              value="{{ product.product_quantity_unit | default('') }}"
+              required
+            />
             <input
               type="number"
               name="grams"
@@ -87,7 +98,7 @@
               class="form-control mb-2"
               required
             />
-            <button type="submit">
+            <button type="submit" class="btn btn-primary" {% if not (product.nutriments or {})['energy-kcal_100g'] %} disabled {% endif %}>
               {% if not (product.nutriments or {})['energy-kcal_100g'] %} No kcal data {% else %}
               Add {% endif %}
             </button>

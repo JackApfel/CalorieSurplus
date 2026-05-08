@@ -1,4 +1,5 @@
 import os
+from functools import lru_cache
 
 import requests
 from cs50 import SQL
@@ -20,6 +21,8 @@ app.config["SECRET_KEY"] = os.environ.get("SECRET_KEY")
 if not app.config["SECRET_KEY"]:
     raise ValueError("No SECRET_KEY set in the environment. Check your .env file.")
 
+cache_maxsize = int(os.environ.get("CACHE_MAXSIZE", 128))
+
 db = SQL("sqlite:///calories.db")
 
 
@@ -27,42 +30,62 @@ db = SQL("sqlite:///calories.db")
 @helpers.login_required
 def index():
     if request.method == "POST":
+        # Get form data and validate it
         name = request.form.get("name")
         calories = request.form.get("product_calories")
         barcode = request.form.get("code")
-        grams = request.form.get("grams")
+        grams_consumed = request.form.get("grams")
+        unit = request.form.get("unit")
 
-        if not calories or not name or not barcode or not grams:
+        if not calories or not name or not barcode or not grams_consumed:
             flash("Fields cannot be empty!", "danger")
             return redirect("/")
 
         try:
             calories = int(round(float(calories)))
-            grams = int(round(float(grams)))
+            grams_consumed = int(round(float(grams_consumed)))
         except ValueError:
             flash("Invalid input: calories/grams missing or not numeric", "danger")
             return redirect("/")
 
-        if grams < 1 or calories < 1:
+        if grams_consumed < 1 or calories < 1:
             flash("Values can not be Zero or less", "danger")
             return redirect("/catalog")
 
+        try:
+            grams_consumed = float(grams_consumed)
+        except ValueError:
+            flash("Invalid quantity input!", "danger")
+            return redirect("/")
+        if not unit:
+            unit = ""
+        # Normalize consumed quantity to base units (g or ml)
+        grams_consumed, unit = helpers.norm_quantity(grams_consumed, unit)
+        grams_consumed = int(round(grams_consumed))
+        print(f"Normalized quantity: {grams_consumed} {unit}")
+
+        # insert the new food entry into the database
         db.execute(
             "INSERT INTO foods (name, product_calories, consumed_calories, barcode, grams, user_id, calorie_goal) VALUES(?,?,?,?,?,?,?)",
             name,
             calories,
-            round((calories / 100) * grams),
+            round((calories / 100) * grams_consumed),
             barcode,
-            grams,
+            grams_consumed,
             session["user_id"],
             session["calorie_goal"],
         )
+
+        # Provide feedback to the user and redirect back to the main page
         flash("Entry Added!", "success")
         return redirect("/")
-    else:
-        foods = db.execute("SELECT * FROM foods WHERE user_id = ?", session["user_id"])
 
-        # Calculate total calories for the day
+    else:
+        daily_food_entries = db.execute(
+            "SELECT * FROM foods WHERE user_id = ? AND DATE(created_at) = DATE('now') ORDER BY created_at DESC",
+            session["user_id"],
+        )
+
         daily_calories = db.execute(
             "SELECT SUM(consumed_calories) AS daily_calories FROM foods WHERE user_id = ? AND DATE(created_at) = DATE('now')",
             session["user_id"],
@@ -73,11 +96,18 @@ def index():
             session["user_id"],
         )
 
+        progress_percentage = (
+            (daily_calories[0]["daily_calories"] / session["calorie_goal"]) * 100
+            if daily_calories[0]["daily_calories"] and session["calorie_goal"]
+            else 0
+        )
+
         return render_template(
             "index.html",
-            foods=foods,
+            foods=daily_food_entries,
             daily_calories=daily_calories,
             weekly_calories=weekly_calories,
+            progress_percentage=progress_percentage,
         )
 
 
@@ -179,30 +209,41 @@ def logout():
         return render_template("logout.html")
 
 
+@lru_cache(maxsize=None)
+def get_product(search_term):
+
+    params = {
+        "search_terms": search_term,
+        "json": "true",
+        "page_size": 8,
+        # Only request the fields we actually need — massively reduces response size and latency
+        "fields": "product_name,brands,nutriments,image_front_small_url,code,quantity,product_quantity,product_quantity_unit",
+    }
+
+    headers = {
+        # Format: AppName/Version (contact-email) — no special chars in name, email in parentheses
+        "User-Agent": "KalorienZaehler/0.1 (jack.apfel_dev@pm.me)"
+    }
+
+    url = "https://world.openfoodfacts.org/cgi/search.pl"
+
+    response = requests.get(url, params=params, headers=headers, timeout=32)
+    response.raise_for_status()
+    data = response.json()
+
+    return data
+
+
 @app.route("/catalog", methods=["GET", "POST"])
 @helpers.login_required
 def catalog():
     if request.method == "POST":
-        search_term = str(request.form.get("search"))
-        params = {
-            "search_terms": search_term,
-            "json": "true",
-            "page_size": 8,
-            # Only request the fields we actually need — massively reduces response size and latency
-            "fields": "product_name,brands,nutriments,image_front_small_url,code,quantity",
-        }
-
-        headers = {
-            # Format: AppName/Version (contact-email) — no special chars in name, email in parentheses
-            "User-Agent": "KalorienZaehler/0.1 (jack.apfel_dev@pm.me)"
-        }
-
-        url = "https://world.openfoodfacts.org/cgi/search.pl"
-
+        search_term = request.form.get("search")
+        search_term = (
+            (search_term or "").strip().lower()
+        )  # Copilot came up with the 'or' fix to handle None values
         try:
-            response = requests.get(url, params=params, headers=headers, timeout=32)
-            response.raise_for_status()
-            data = response.json()
+            data = get_product(search_term)
         except requests.exceptions.Timeout:
             flash(
                 "The food database took too long to respond. Please try again.",
