@@ -1,6 +1,6 @@
-# Kalorien Zähler
+# CalorieSurplus
 
-#### a CS50x Final Project
+#### Work in Progress / a CS50x Final Project
 
 ## Overview
 
