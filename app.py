@@ -1,5 +1,7 @@
+from datetime import datetime
 import os
 from functools import lru_cache
+from time import strftime
 
 import requests
 from cs50 import SQL
@@ -26,6 +28,14 @@ cache_maxsize = int(os.environ.get("CACHE_MAXSIZE", 128))
 db = SQL("sqlite:///calories.db")
 
 
+# Source - https://stackoverflow.com/a/29516120
+# Posted by lapinkoira, modified by community. See post 'Timeline' for change history
+# Retrieved 2026-05-11, License - CC BY-SA 4.0
+@app.errorhandler(404)
+def page_not_found(e):
+    return render_template('404.html'), 404
+
+
 @app.route("/", methods=["GET", "POST"])
 @helpers.login_required
 def index():
@@ -36,8 +46,9 @@ def index():
         barcode = request.form.get("code")
         grams_consumed = request.form.get("grams")
         unit = request.form.get("unit")
+        brand = request.form.get("brand")
 
-        if not calories or not name or not barcode or not grams_consumed:
+        if not calories or not name or not barcode or not grams_consumed or not brand:
             flash("Fields cannot be empty!", "danger")
             return redirect("/")
 
@@ -62,12 +73,13 @@ def index():
         # Normalize consumed quantity to base units (g or ml)
         grams_consumed, unit = helpers.norm_quantity(grams_consumed, unit)
         grams_consumed = int(round(grams_consumed))
-        print(f"Normalized quantity: {grams_consumed} {unit}")
+
+        full_name = f"{name} - {brand}"
 
         # insert the new food entry into the database
         db.execute(
             "INSERT INTO foods (name, product_calories, consumed_calories, barcode, grams, user_id, calorie_goal) VALUES(?,?,?,?,?,?,?)",
-            name,
+            full_name,
             calories,
             round((calories / 100) * grams_consumed),
             barcode,
@@ -101,6 +113,10 @@ def index():
             if daily_calories[0]["daily_calories"] and session["calorie_goal"]
             else 0
         )
+
+        for entry in daily_food_entries:
+            dt = datetime.fromisoformat(entry["created_at"])
+            entry["format_created_at"] = dt.strftime("%H:%M")
 
         return render_template(
             "index.html",
@@ -209,9 +225,8 @@ def logout():
         return render_template("logout.html")
 
 
-@lru_cache(maxsize=None)
+@lru_cache(maxsize=cache_maxsize)
 def get_product(search_term):
-
     params = {
         "search_terms": search_term,
         "json": "true",
@@ -242,6 +257,9 @@ def catalog():
         search_term = (
             (search_term or "").strip().lower()
         )  # Copilot came up with the 'or' fix to handle None values
+        if not search_term or search_term == "":
+            flash("Please enter a product name.", "danger")
+            return redirect("/catalog")
         try:
             data = get_product(search_term)
         except requests.exceptions.Timeout:
@@ -292,6 +310,9 @@ def history():
             )
             return redirect("/history")
 
+        for entry in products:
+            dt = datetime.fromisoformat(entry["created_at"])
+            entry["format_created_at"] = dt.strftime("%H:%M")
         return render_template(
             "history.html", foods=products, date=date, total_calories=total_calories
         )

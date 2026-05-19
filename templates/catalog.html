@@ -1,112 +1,116 @@
 {% extends "layout.html" %} {% block title %}Catalog{% endblock %} {% block content %}
-<div class="container mt-5 text-center"></div>
-<!--Build with the CHEATSHEET as reference-->
-<div class="container mt-5 text-center">
-  <h1>Catalog</h1>
-</div>
-
-<form action="/catalog" method="post" class="mt-5">
-  <label for="catalogSearchInput" class="form-label">Enter Product Name</label>
-  <div class="containerr-sm text-center">
-    <div class="row row-cols-sm-2">
-      <div class="col-sm mb-3">
-        <input
-          id="catalogSearchInput"
-          type="text"
-          class="form-control mb-sm-3 pb-3 pt-3 text-center"
-          placeholder="Freeway Iso Sport"
-          name="search"
-          required
-        />
-      </div>
-      <div class="col-sm">
-        <button type="submit" class="btn btn-primary form-control pb-3 pt-3 text-center mb-5">
-          Search Product
-        </button>
-      </div>
+    <div class="container text-center"></div>
+    <!--
+    <div class="container mt-5 text-center">
+    <h1>Catalog</h1>
     </div>
-  </div>
-</form>
+    -->
 
-<div class="container">
-  <!-- AI-assisted: bottom-align cards per grid row via Bootstrap flex alignment -->
-  <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-3 align-items-end">
-    {% if item %} {% for product in item.products %}
-    <!-- AI-assisted: Full-height chain keeps the form controls aligned near the same baseline -->
-    <div class="col mb-3 d-flex align-items-end h-100">
-      <form action="/" method="POST" class="w-100 d-flex align-items-end h-100">
-        <div class="card rounded w-100 h-100">
-          <img
-            src="{{product.image_front_small_url}}"
-            alt="{{product.product_name | default('Unknown')}}"
-            style="max-width: 50%; height: auto"
-            class="img-thumbnail rounded"
-          />
-          <div class="card-body d-flex flex-column justify-content-end h-100">
-            <p class="h5 card-title">{{product.product_name | default("Unknown")}}</p>
-            <ul>
-              <li><p class="card-text">Brand: {{product.brands | default("Unknown")}}</p></li>
-              <li>
-                <p class="card-text">
-                  Calories per 100g:
-                  <strong
-                    >{{ (product.nutriments or {})['energy-kcal_100g'] | default('N/A') }}</strong
-                  >
-                </p>
-              </li>
-              <li>
-                <p class="card-text">
-                  Quantity:
-                  <strong>{{ product.product_quantity | default('N/A') }}{{ product.product_quantity_unit | default('') }}</strong>
-                </p>
-              </li>
-            </ul>
-            <input
-              type="hidden"
-              name="name"
-              value="{{ product.product_name | default('Unknown') }}"
-              required
-            />
-            <input
-              type="hidden"
-              name="product_calories"
-              value="{{ (product.nutriments or {})['energy-kcal_100g'] | default('N/A') }}"
-              required
-            />
-            <input
-              type="hidden"
-              name="code"
-              value="{{ product.code | default('Unknown') }}"
-              required
-            />
-             <input
-              type="hidden"
-              name="quantity"
-              value="{{ product.product_quantity | default('N/A') }}"
-              required
-            />
-             <input
-              type="hidden"
-              name="unit"
-              value="{{ product.product_quantity_unit | default('') }}"
-              required
-            />
-            <input
-              type="number"
-              name="grams"
-              placeholder="consumed grams"
-              class="form-control mb-2"
-              required
-            />
-            <button type="submit" class="btn btn-primary" {% if not (product.nutriments or {})['energy-kcal_100g'] %} disabled {% endif %}>
-              {% if not (product.nutriments or {})['energy-kcal_100g'] %} No kcal data {% else %}
-              Add {% endif %}
-            </button>
-          </div>
+    <form action="/catalog" method="post" class="">
+        <label for="catalogSearchInput" class="form-label">Enter Product Name</label>
+        <div class="container-sm text-center">
+            <div class="row row-cols-sm-2">
+                <div class="col-sm mb-3">
+                    <input
+                            id="catalogSearchInput"
+                            type="text"
+                            class="form-control mb-sm-3 pb-3 pt-3 text-center"
+                            placeholder="Freeway Iso Sport"
+                            name="search"
+                            required
+                    />
+                </div>
+                <div class="col-sm">
+                    <button type="submit" class="btn btn-primary form-control pb-3 pt-3 text-center mb-5">
+                        <i class="bi bi-search"></i> Search Product
+                    </button>
+                </div>
+            </div>
         </div>
-      </form>
+    </form>
+
+    <div class="container">
+        <!-- AI-assisted: bottom-align cards per grid row via Bootstrap flex alignment -->
+        <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-3 align-items-end">
+            {% if item %} {% for product in item.products %}
+                <!-- AI-assisted: Full-height chain keeps the form controls aligned near the same baseline -->
+                <div class="col mb-3 d-flex align-items-end h-100">
+                    <form action="/" method="POST" class="w-100 d-flex align-items-end h-100">
+                        <div class="card rounded w-100 h-100">
+                            <img
+                                    src="{{ product.image_front_small_url }}"
+                                    alt="{{ product.product_name | default('Unknown') }}"
+                                    style="max-width: 50%; height: auto"
+                                    class="img-thumbnail rounded"
+                            />
+                            <div class="card-body d-flex flex-column justify-content-end h-100">
+                                <p class="h5 card-title">{{ product.product_name | default("Unknown") }}</p>
+                                <p class="card-text mb-2">Brand: <strong>{{ product.brands | default("Unknown") }}</strong></p>
+                                <p class="card-text mb-2">
+                                    K/Cal per 100g:
+                                    <strong
+                                    >{{ (product.nutriments or {})['energy-kcal_100g'] | default('N/A') | round }}</strong
+                                    >
+                                </p>
+                                <p class="card-text mb-4">
+                                    Quantity:
+                                    <strong>
+                                        {{ product.product_quantity | default('N/A') }}{{ product.product_quantity_unit | default('') }}</strong>
+                                </p>
+                                <input
+                                        type="hidden"
+                                        name="brand"
+                                        value="{{ product.brands | default("Unknown") }}"
+                                       required
+                                />
+                                <input
+                                        type="hidden"
+                                        name="name"
+                                        value="{{ product.product_name | default('Unknown') }}"
+                                        required
+                                />
+                                <input
+                                        type="hidden"
+                                        name="product_calories"
+                                        value="{{ (product.nutriments or {})['energy-kcal_100g'] | default('N/A') }}"
+                                        required
+                                />
+                                <input
+                                        type="hidden"
+                                        name="code"
+                                        value="{{ product.code | default('Unknown') }}"
+                                        required
+                                />
+                                <input
+                                        type="hidden"
+                                        name="quantity"
+                                        value="{{ product.product_quantity | default('N/A') }}"
+                                        required
+                                />
+                                <input
+                                        type="hidden"
+                                        name="unit"
+                                        value="{{ product.product_quantity_unit | default('') }}"
+                                        required
+                                />
+                                <input
+                                        type="number"
+                                        name="grams"
+                                        placeholder="Consumed amount (g/ml)"
+                                        class="form-control mb-2"
+                                        required
+                                />
+                                <button type="submit" class="btn btn-primary"
+                                        {% if not (product.nutriments or {})['energy-kcal_100g'] %}
+                                        disabled {% endif %}>
+                                    {% if not (product.nutriments or {})['energy-kcal_100g'] %} No kcal data {% else %}
+                                        <i class="bi bi-plus-circle"></i> Add {% endif %}
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            {% endfor %} {% endif %}
+        </div>
     </div>
-    {% endfor %} {% endif %}
-  </div>
-</div>
 {% endblock %}

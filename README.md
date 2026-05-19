@@ -1,4 +1,6 @@
-# Kalorien Zähler
+# CalorieSurplus
+#### Video Demo:  TODO
+#### Description:
 
 #### a CS50x Final Project
 
@@ -77,8 +79,7 @@ External data is fetched via HTTP requests to Open Food Facts.
   - `css/`
     - `layout.css`
   - `js/`
-    - `scripts.js`
-
+  
 ## Data Structure
 
 This project uses a small SQLite database with three main tables: users, foods, and preferences.
@@ -185,7 +186,3 @@ AI-assisted code is marked via comments.
 
 When AI was used, it followed the guidance in the project prompt created with GitHub Copilot.
 See: `.github/prompts/honesty.prompt.md`.
-
-## Video Demo
-
-TODO

@@ -1,63 +1,63 @@
 {% extends "layout.html" %} {% block title %}Register{% endblock %} {% block content %}
-<!-- Assisted by GitHub Copilot while fixing Bootstrap mobile-first form structure. -->
-<form action="/register" method="POST" class="container py-4">
-  <div class="row g-3">
-    <!--
-    <div class="col-12 col-md-6">
-        <input
-        type="text"
-        class="form-control"
-        placeholder="First name"
-        aria-label="First name"
-        name="first_name"
-        required
-      />
-    </div>
-    <div class="col-12 col-md-6">
-      <input
-        type="text"
-        class="form-control"
-        placeholder="Last name"
-        aria-label="Last name"
-        name="last_name"
-        required
-      />
-    </div>
-    -->
-    <div class="col-12">
-      <input
-        type="email"
-        class="form-control"
-        placeholder="Email"
-        aria-label="Email"
-        name="email"
-        required
-      />
-    </div>
-    <div class="col-12">
-      <input
-        type="password"
-        class="form-control"
-        placeholder="Password"
-        aria-label="Password"
-        name="password"
-        required
-      />
-    </div>
-    <div class="col-12">
-      <input
-        type="password"
-        class="form-control"
-        placeholder="Confirm password"
-        aria-label="Confirm password"
-        name="confirm_password"
-        required
-      />
-    </div>
-    <div class="col-12 d-grid">
-      <button type="submit" class="btn btn-primary">Register</button>
-    </div>
-  </div>
-  <a href="/login">Already have an account? Sign in here</a>
-</form>
+    <!-- Assisted by GitHub Copilot while fixing Bootstrap mobile-first form structure. -->
+    <form action="/register" method="POST" class="container py-4">
+        <div class="row g-3">
+            <!--
+            <div class="col-12 col-md-6">
+                <input
+                type="text"
+                class="form-control"
+                placeholder="First name"
+                aria-label="First name"
+                name="first_name"
+                required
+              />
+            </div>
+            <div class="col-12 col-md-6">
+              <input
+                type="text"
+                class="form-control"
+                placeholder="Last name"
+                aria-label="Last name"
+                name="last_name"
+                required
+              />
+            </div>
+            -->
+            <div class="col-12">
+                <input
+                        type="email"
+                        class="form-control"
+                        placeholder="Email"
+                        aria-label="Email"
+                        name="email"
+                        required
+                />
+            </div>
+            <div class="col-12">
+                <input
+                        type="password"
+                        class="form-control"
+                        placeholder="Password"
+                        aria-label="Password"
+                        name="password"
+                        required
+                />
+            </div>
+            <div class="col-12">
+                <input
+                        type="password"
+                        class="form-control"
+                        placeholder="Confirm password"
+                        aria-label="Confirm password"
+                        name="confirm_password"
+                        required
+                />
+            </div>
+            <div class="col-12 d-grid">
+                <button type="submit" class="btn btn-primary"><i class="bi bi-person-plus"></i> Register</button>
+            </div>
+        </div>
+        <a href="/login">Already have an account? Sign in here</a>
+    </form>
 {% endblock %}

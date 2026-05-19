@@ -3,3 +3,6 @@ Flask
 Flask-Session
 requests
 dotenv
+
+python-dotenv
+werkzeug
