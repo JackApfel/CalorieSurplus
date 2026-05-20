@@ -313,8 +313,12 @@ def history():
         for entry in products:
             dt = datetime.fromisoformat(entry["created_at"])
             entry["format_created_at"] = dt.strftime("%H:%M")
+
+        calory_goal = products[0]["calorie_goal"]
+        print(products[0]["calorie_goal"])
+
         return render_template(
-            "history.html", foods=products, date=date, total_calories=total_calories
+            "history.html", foods=products, date=date, total_calories=total_calories, calory_goal=calory_goal
         )
 
     else:

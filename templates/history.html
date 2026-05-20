@@ -35,9 +35,7 @@
         </div>
     </form>
     {% if date %}
-    <p class="h3">
-        Total: {{ total_calories[0].total_calories | default("0", true) }} k/cal
-    </p>
+    <span class="h3">Total: {{ total_calories[0].total_calories | default("0", true) }}</span><span>K/Cal</span>
     {% endif %}
     <div class="container">
         <div class="container text-center mt-5">

@@ -49,7 +49,7 @@
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
                 <!-- me-auto pushes the theme button to the right -->
                 <!-- Copilot helped tidy up the logic for active links -->
-                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <ul class="navbar-nav me-auto mb-lg-0">
                     <li class="nav-item">
                         {# Use request.path (Flask Request) to mark the active nav link. #}
                         <a class="nav-link {{ 'active fw-bold' if request.path == '/' else '' }}" aria-current="page" href="/">Home</a>
@@ -92,7 +92,7 @@
         <div class="container py-3">
             {% for category, message in messages %} {% set bs_category = "info" if category == "message"
         else category %}
-                <div class="alert alert-{{ bs_category }} alert-dismissible fade show mb-2" role="alert">
+                <div class="alert alert-{{ bs_category }} alert-dismissible fade show mb-sm-2" role="alert">
                     <div class="fw-medium">{{ message }}</div>
                     <button
                             type="button"
@@ -108,7 +108,7 @@
 
 <!-- flex-grow-1 consumes leftover vertical space so footer stays at bottom -->
 <main class="flex-grow-1 py-4">
-    <div class="container mt-5">{% block content %}{% endblock %}</div>
+    <div class="container mt-sm-5">{% block content %}{% endblock %}</div>
 </main>
 
 <footer class="mt-auto py-3 border-top bg-body text-body">
