@@ -47,7 +47,7 @@
                                 <p class="h5 card-title">{{ product.product_name | default("Unknown") }}</p>
                                 <p class="card-text mb-2">Brand: <strong>{{ product.brands | default("Unknown") }}</strong></p>
                                 <p class="card-text mb-2">
-                                    K/Cal per 100g:
+                                    kcal per 100g:
                                     <strong
                                     >{{ (product.nutriments or {})['energy-kcal_100g'] | default('N/A') | round }}</strong
                                     >

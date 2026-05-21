@@ -19,8 +19,7 @@ It was built as a learning project and as my final project for Harvard's CS50x c
 ## Features
 
 - Register to create an account and log in at any time.
-- Search products by name.
-- Enter the consumed grams for a selected product.
+- Search products by name with automatic caching to reduce API requests.
 - Calories are automatically calculated and summarized.
 - Set a personal calorie goal on the preferences page.
 - Check your meal history.
@@ -68,17 +67,16 @@ External data is fetched via HTTP requests to Open Food Facts.
 ## Project Structure
 
 - `app.py` - Contains routes and core app logic
-- `helpers.py` - Contains utility functions and decorators
+- `helpers.py` - Contains utility functions, decorators, and unit conversion logic
 - `init_db.py` - Creates and resets the database schema
 - `requirements.txt` - Python dependencies
-- `.env` - Stores environment variables
+- `.env` - Stores environment variables (see `.env.example`)
 - `templates/` - Contains Jinja HTML pages
   - `layout.html` - Base layout for Jinja and all HTML files
-  - `index.html`, `login.html`, ...
+  - `index.html`, `login.html`, `register.html`, `logout.html`, `catalog.html`, `history.html`, `preference.html`, `404.html`
 - `static/` - Contains CSS and JavaScript assets
-  - `css/`
-    - `layout.css`
-  - `js/`
+  - `css/layout.css` - Main stylesheet
+  - `js/` - JavaScript utilities
   
 ## Data Structure
 
@@ -147,6 +145,8 @@ Product lookup is provided by Open Food Facts, which fits this project very well
 
 Requests to the Open Food Facts API include a descriptive `User-Agent`, only required fields to reduce payload size, and robust timeout/error handling for better user feedback.
 
+**Caching:** OFF search results are cached using Python's `lru_cache` decorator (configured via `CACHE_MAXSIZE` environment variable). This significantly reduces API requests for frequently searched items and improves response times.
+
 ### Input Validation & UX
 
 Numeric inputs such as calories, grams, and goals are validated and cast to integers for more reliable handling and cleaner display.
@@ -165,7 +165,7 @@ I kept the UI as simple as possible because I am not a designer, and a simpler l
 **Limitations:**
 
 - The Open Food Facts (OFF) API does not cover all products or home-cooked meals.
-- The app does not currently cache OFF results, which would help reduce API requests for frequently searched items.
+- The app caches OFF results in memory; cache is cleared when the application restarts.
 - The Open Food Facts API has strict request limits.
 
 **Future Work:**
@@ -173,16 +173,17 @@ I kept the UI as simple as possible because I am not a designer, and a simpler l
 - Improve the visual design to make the interface more polished and appealing.
 - Tidy up the database schema.
 - Address frequent 503 errors.
+- Support for barcode scanning on mobile devices.
 
 ## Academic Honesty & AI Usage
 
 This project follows CS50's Academic Honesty guidelines.
 
-I minimized AI usage as much as possible, but used it when I forgot syntax, to refactor `layout.html`, and to help audit parts of my code.
+AI was used selectively to improve productivity without compromising understanding. Specific uses include:
+- Secure configuration management setup with `python-dotenv`
+- Flask decorator pattern implementation
+- Syntax assistance for SQL UPDATE statements
+- Code review and refactoring of `layout.html`
+- Formalization of documentation
 
-I also used AI to help formalize parts of my writing and documentation.
-
-AI-assisted code is marked via comments.
-
-When AI was used, it followed the guidance in the project prompt created with GitHub Copilot.
-See: `.github/prompts/honesty.prompt.md`.
+AI-assisted code is marked via comments in the source files.

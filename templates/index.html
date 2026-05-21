@@ -10,7 +10,7 @@
                 <span class="h3 {{ 'text-success' if (daily_calories[0].daily_calories | default(0, true) | round) > session.calorie_goal else 'text-danger' }}">
                     {{ (daily_calories[0].daily_calories | default(0, true) | round) }}
                 </span>
-                            <span class="text-muted"> k/cal</span>
+                            <span class="text-muted"> kcal</span>
                         </div>
 
                         <div>
@@ -19,11 +19,11 @@
                         </div>
                     </div>
 
-                    <div class="progress" role="progressbar" aria-label="Animated striped"
+                    <div class="progress h-50 mb-sm-5" role="progressbar" aria-label="Animated striped"
                          aria-valuenow="{{ progress_percentage }}"
                          aria-valuemin="0" aria-valuemax="100">
                         <div class="progress-bar progress-bar-striped progress-bar-animated"
-                             style="width: {{ progress_percentage }}%"></div>
+                             style="width: {{ progress_percentage }}%;"></div>
                     </div>
 
                 </div>
@@ -40,7 +40,7 @@
                                     <h5 class="card-title text-center">{{ food.name }}</h5>
                                     <h6 class="card-subtitle mb-1 text-body-secondary mt-1">Consumed:</h6>
                                     <p class="card-text text-left mb-1">{{ food.grams }} g</p>
-                                    <p class="card-text text-left mb-2">{{ food.consumed_calories }} k/cal</p>
+                                    <p class="card-text text-left mb-2">{{ food.consumed_calories }} kcal</p>
 
                                     <!--
                                     <div class="progress" role="progressbar" aria-label="Animated striped example"
