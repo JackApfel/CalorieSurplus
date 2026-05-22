@@ -48,15 +48,6 @@
                                 <h6 class="card-subtitle mb-1 text-body-secondary mt-1">Consumed:</h6>
                                 <p class="card-text text-left mb-1">{{ food.grams }} g</p>
                                 <p class="card-text text-left mb-2">{{ food.consumed_calories }} kcal</p>
-
-                                <!--
-                                    <div class="progress" role="progressbar" aria-label="Animated striped example"
-                                         aria-valuenow="75"
-                                         aria-valuemin="0" aria-valuemax="100">
-                                        <div class="progress-bar"
-                                             style="width: {{ food.consumed_calories / session.calorie_goal * 100 }}%"></div>
-                                    </div>
--->
                                 <p class="card-subtitle mb-2 text-body-secondary">Time: {{ food.format_created_at }}</p>
 
                                 <form action="/delete_entry" method="POST">
