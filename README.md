@@ -1,6 +1,8 @@
 # CalorieSurplus
-#### Video Demo:  TODO
-#### Description:
+
+#### Video Demo: TODO
+
+#### Description
 
 #### a CS50x Final Project
 
@@ -53,16 +55,20 @@ External data is fetched via HTTP requests to Open Food Facts.
 
 **Installation:**
 
-- Clone this repository `git clone https://github.com/JackApfel/Kalorien-Z-hler.git`
-- Create a virtual environment `python3.14 -m venv .venv`
+- Clone this repository: `git clone https://github.com/JackApfel/CalorieSurplus.git`
+- Navigate into the directory: `cd CalorieSurplus`
+- Create a virtual environment: `python3.14 -m venv .venv`
 - Activate the virtual environment:
   - Linux/macOS: `source .venv/bin/activate`
   - Windows (PowerShell): `.venv\Scripts\Activate.ps1`
   - Windows (CMD): `.venv\Scripts\activate.bat`
-- Install dependencies `pip install -r requirements.txt`
-- Create the database `python init_db.py -c`
-- Create `.env` from `.env.example` and set `SECRET_KEY` and `FLASK_DEBUG`
-- Start the app with `flask run`
+- Install dependencies: `pip install -r requirements.txt`
+- Create the `.env` file from the example:
+  - Linux/macOS: `cp .env.example .env`
+  - Windows: `copy .env.example .env`
+- Open the `.env` file and set your `SECRET_KEY`
+- Create the database: `python init_db.py -c`
+- Start the app: `flask run`
 
 ## Project Structure
 
@@ -77,7 +83,7 @@ External data is fetched via HTTP requests to Open Food Facts.
 - `static/` - Contains CSS and JavaScript assets
   - `css/layout.css` - Main stylesheet
   - `js/` - JavaScript utilities
-  
+
 ## Data Structure
 
 This project uses a small SQLite database with three main tables: users, foods, and preferences.
@@ -180,6 +186,7 @@ I kept the UI as simple as possible because I am not a designer, and a simpler l
 This project follows CS50's Academic Honesty guidelines.
 
 AI was used selectively to improve productivity without compromising understanding. Specific uses include:
+
 - Secure configuration management setup with `python-dotenv`
 - Flask decorator pattern implementation
 - Syntax assistance for SQL UPDATE statements
