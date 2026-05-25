@@ -6,6 +6,7 @@ from time import strftime
 import requests
 from cs50 import SQL
 from dotenv import load_dotenv
+from email_validator import validate_email
 from flask import Flask, flash, redirect, render_template, request, session
 from werkzeug.security import check_password_hash, generate_password_hash
 
@@ -183,6 +184,13 @@ def register():
             flash("Email, password, and confirmation are required.", "warning")
             return redirect("/register")
 
+        try:
+            email_info = validate_email(email, check_deliverability=False)
+            email = email_info.normalized
+        except:
+            flash("Invalid email.", "warning")
+            return redirect("/register")
+
         if password != confirm_password:
             flash("Passwords do not match.", "warning")
             return redirect("/register")
@@ -190,6 +198,7 @@ def register():
         if db.execute("SELECT * FROM users WHERE email = ?", email):
             flash("This email is already registered.", "warning")
             return redirect("/register")
+
 
         hash = generate_password_hash(password)
 

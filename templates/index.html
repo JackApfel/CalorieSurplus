@@ -27,11 +27,21 @@
                     </div>
 
                 </div>
+                <div class="col-12 mt-4">
+                    {% set today_cal = (daily_calories[0].daily_calories | default(0, true) | round) %}
+                    {% set goal =  session.calorie_goal %}
+                    {% if today_cal >= goal %}
+                        <p class="text-muted">Congratulations! You've reached your calorie goal for today!</p>
+                    {% else %}
+                        {% set remaining = goal - today_cal %}
+                        <p class="text-muted">You have <span class="fw-medium">{{ remaining }}</span> kcal remaining for today.</p>
+                    {% endif %}
+                </div>
             </div>
         </div>
 
         <div class="container">
-            <div class="container text-center mt-5">
+            <div class="container text-center mt-3">
                 <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-3 align-items-end">
                     {% for food in foods %}
                         <div class="col mb-3 d-flex align-items-end h-100">
