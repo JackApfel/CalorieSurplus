@@ -45,23 +45,30 @@
                             />
                             <div class="card-body d-flex flex-column justify-content-end h-100">
                                 <p class="h5 card-title">{{ product.product_name | default("Unknown") }}</p>
-                                <p class="card-text mb-2">Brand: <strong>{{ product.brands | default("Unknown") }}</strong></p>
+                                <p class="card-text mb-2">Brand:
+                                    <strong>{{ product.brands | default("Unknown") }}</strong></p>
                                 <p class="card-text mb-2">
-                                    K/Cal per 100g:
-                                    <strong
-                                    >{{ (product.nutriments or {})['energy-kcal_100g'] | default('N/A') | round }}</strong
-                                    >
+                                    kcal per 100g:
+                                    <strong>
+                                        {% set kcal = (product.nutriments or {})['energy-kcal_100g'] or "" %}
+                                        {{ (kcal | float | round | int) if kcal is not none and kcal != "" else 'N/A' }}
+                                    </strong>
                                 </p>
                                 <p class="card-text mb-4">
                                     Quantity:
                                     <strong>
-                                        {{ product.product_quantity | default('N/A') }}{{ product.product_quantity_unit | default('') }}</strong>
+                                        {% set quantity = (product.product_quantity | default('N/A')) %}
+                                        {{ (quantity | float | round | int) if quantity is not none and not null and quantity != "" else 'N/A' }}{{ product.product_quantity_unit | default('') }}
+                                    </strong>
                                 </p>
                                 <input
                                         type="hidden"
                                         name="brand"
-                                        value="{{ product.brands | default("Unknown") }}"
-                                       required
+                                        value="
+                                            {% set brand_name = product.brands | default("Unknown") %}
+                                            {{ brand_name if brand_name != "" else "Unknown" }}
+                                            "
+                                        required
                                 />
                                 <input
                                         type="hidden"
@@ -72,7 +79,8 @@
                                 <input
                                         type="hidden"
                                         name="product_calories"
-                                        value="{{ (product.nutriments or {})['energy-kcal_100g'] | default('N/A') }}"
+                                        value="{% set kcal = (product.nutriments or {})['energy-kcal_100g'] or "" %}
+                                        {{ (kcal | float | round | int) if kcal is not none and kcal != "" else 'N/A' }}"
                                         required
                                 />
                                 <input

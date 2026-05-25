@@ -1,37 +1,56 @@
 {% extends "layout.html" %} {% block title %}Home{% endblock %} {% block content %}
-    <div class="container mt-5 text-center">
+    <div class="container text-center">
 
-        <div class="container text-center mt-5">
+        <div class="container text-center">
             <div class="row">
-                <div class="col-sm-6">
-                    <h2>Calories Today: {{ (daily_calories[0].daily_calories | default(0, true) | round) }}</h2>
-                </div>
-                <div class="col-sm-6">
-                    <h3>Calorie Goal: {{ session.calorie_goal }}</h3>
-                </div>
-                <div class="col-sm-12">
+                <div class="col-12">
 
-                    <div class="progress" role="progressbar" aria-label="Animated striped example" aria-valuenow="75"
-                         aria-valuemin="0" aria-valuemax="100">
-                        <div class="progress-bar progress-bar-striped progress-bar-animated"
-                             style="width: {{ progress_percentage }}%"></div>
+                    <div class="d-flex justify-content-between align-items-end mb-1">
+                        <div>
+                <span class="h3 {{ 'text-success' if (daily_calories[0].daily_calories | default(0, true) | round) > session.calorie_goal else 'text-danger' }}">
+                    {{ (daily_calories[0].daily_calories | default(0, true) | round) }}
+                </span>
+                            <span class="text-muted"> kcal</span>
+                        </div>
+
+                        <div>
+                            <span class="text-muted">Goal: </span>
+                            <span class="h3">{{ session.calorie_goal }}</span>
+                        </div>
                     </div>
 
+                    <div class="progress h-50 mb-sm-5" role="progressbar" aria-label="Animated striped"
+                         aria-valuenow="{{ progress_percentage }}"
+                         aria-valuemin="0" aria-valuemax="100">
+                        <div class="progress-bar progress-bar-striped progress-bar-animated"
+                             style="width: {{ progress_percentage }}%;"></div>
+                    </div>
+
+                </div>
+                <div class="col-12 mt-4">
+                    {% set today_cal = (daily_calories[0].daily_calories | default(0, true) | round) %}
+                    {% set goal =  session.calorie_goal %}
+                    {% if today_cal >= goal %}
+                        <p class="text-muted">Congratulations! You've reached your calorie goal for today!</p>
+                    {% else %}
+                        {% set remaining = goal - today_cal %}
+                        <p class="text-muted">You have <span class="fw-medium">{{ remaining }}</span> kcal remaining for today.</p>
+                    {% endif %}
                 </div>
             </div>
         </div>
 
         <div class="container">
-            <div class="container text-center mt-5">
+            <div class="container text-center mt-3">
                 <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-3 align-items-end">
                     {% for food in foods %}
                         <div class="col mb-3 d-flex align-items-end h-100">
                             <div class="card text-start" style="width: 18rem;">
                                 <div class="card-body">
                                     <h5 class="card-title text-center">{{ food.name }}</h5>
-                                    <h6 class="card-subtitle mb-1 text-body-secondary mt-1">Consumed:</h6>
-                                    <p class="card-text text-left mb-1">{{ food.grams }} g</p>
-                                    <p class="card-text text-left mb-2">{{ food.consumed_calories }} k/cal</p>
+                                    <h6 class="card-subtitle mb-1 text-body-secondary mt-1">Amount consumed:</h6>
+                                    <p class="card-text text-left mb-1">{{ food.grams }} g / ml</p>
+                                    <p class="card-text text-left mb-2">{{ food.consumed_calories }} kcal</p>
 
                                     <!--
                                     <div class="progress" role="progressbar" aria-label="Animated striped example"
@@ -41,12 +60,14 @@
                                              style="width: {{ food.consumed_calories / session.calorie_goal * 100 }}%"></div>
                                     </div>
 -->
-                                    <p class="card-subtitle text-body-secondary mb-2">Time: {{ food.format_created_at }}</p>
+                                    <p class="card-subtitle text-body-secondary mb-2">
+                                        Time: {{ food.format_created_at }}</p>
 
                                     <form action="/delete_entry" method="POST">
                                         <input type="hidden" name="entry_id" value="{{ food.id }}" required/>
                                         <input type="hidden" name="next" value="/"/>
-                                        <button type="submit" class="btn btn-primary"><i class="bi bi-trash"></i> Remove</button>
+                                        <button type="submit" class="btn btn-primary"><i class="bi bi-trash"></i> Remove
+                                        </button>
                                     </form>
                                 </div>
                             </div>
