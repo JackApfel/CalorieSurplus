@@ -1,14 +1,10 @@
 # CalorieSurplus
 
-#### Video Demo: TODO
+#### Video Demo: https://youtu.be/bwsQZtJceY4
 
 #### Description
 
-#### a CS50x Final Project
-
-## Overview
-
-This project is a web application built with Flask and SQLite.
+This project is a web application built with Flask and SQLite, created as my Final Project for Harvard's CS50x course.
 
 The app is for people who want to track their calorie intake and set a daily calorie goal.
 
