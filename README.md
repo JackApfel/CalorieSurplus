@@ -1,7 +1,5 @@
 # CalorieSurplus
 
-#### Video Demo: https://youtu.be/bwsQZtJceY4
-
 #### Description
 
 This project is a web application built with Flask and SQLite, created as my Final Project for Harvard's CS50x course.
